@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notas de Manutenção de Embalagem</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f6f8;
+            color: #333
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: auto;
+            padding: 10px 30px 30px;
+        }
+
+        header {
+            margin-bottom: 18px;
+        }
+
+        .logo {
+            display: block;
+            width: 200px;
+            height: auto;
+            object-fit: contain;
+            margin-left: 0px;
+            margin-bottom: 35px;
+        }
+
+        .header-text {
+            min-width: 0;
+        }
+
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 6px;
+            color: #222
+        }
+
+        header p {
+            color: #666;
+            font-size: 15px
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 25px
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .08)
+        }
+
+        .card-title {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 8px
+        }
+
+        .card-value {
+            font-size: 30px;
+            font-weight: bold;
+            color: #222
+        }
+
+        .yellow {
+            border-left: 5px solid #f1c40f
+        }
+
+        .red {
+            border-left: 5px solid #e74c3c
+        }
+
+        .gray {
+            border-left: 5px solid #7f8c8d
+        }
+
+        .total {
+            border-left: 5px solid #3498db
+        }
+
+        .chart-container {
+            background: #fff;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+            margin-bottom: 18px
+        }
+
+        .chart-header {
+            margin-bottom: 20px
+        }
+
+        .chart-header h2 {
+            font-size: 20px;
+            margin-bottom: 5px
+        }
+
+        .chart-header p {
+            color: #777;
+            font-size: 14px
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 500px
+        }
+
+        .vencimento-panel {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+            margin-bottom: 25px;
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transform: translateY(-8px);
+            transition: max-height .3s ease, opacity .25s ease, transform .3s ease
+        }
+
+        .vencimento-panel.aberto {
+            max-height: 760px;
+            opacity: 1;
+            transform: translateY(0)
+        }
+
+        .vencimento-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 22px;
+            border-bottom: 1px solid #eee
+        }
+
+        .vencimento-header h3 {
+            font-size: 17px;
+            color: #222
+        }
+
+        .linha-selecionada {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 76px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: .4px;
+            color: #fff;
+            background: #3498db;
+            box-shadow: 0 5px 14px rgba(52, 152, 219, .28);
+            transform: scale(1);
+            transition: transform .18s ease, box-shadow .18s ease, background .18s ease
+        }
+
+        .linha-selecionada.trocando {
+            transform: scale(1.09);
+            box-shadow: 0 7px 18px rgba(52, 152, 219, .38)
+        }
+
+        .vencimento-grid {
+            display: grid;
+            grid-template-columns: 1.05fr repeat(3, 1fr);
+            gap: 12px;
+            padding: 18px 22px 14px;
+            transition: opacity .16s ease, transform .16s ease
+        }
+
+        .status-section {
+            margin: 4px 22px 0;
+            padding: 18px 0 14px;
+            border-top: 1px solid #e2e6e9;
+        }
+
+        .status-section-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            color: #8b949c;
+            margin-bottom: 12px;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .vencimento-panel.atualizando .vencimento-grid {
+            opacity: .35;
+            transform: translateY(5px)
+        }
+
+        .vencimento-item {
+            border-radius: 8px;
+            padding: 14px;
+            background: #f7f8f9;
+            border: 1px solid #e8eaec;
+            transition: transform .2s ease, box-shadow .2s ease, background .2s ease
+        }
+
+        .vencimento-panel.pulso .vencimento-item {
+            animation: vencimentoPulso .36s ease
+        }
+
+        @keyframes vencimentoPulso {
+            0% {
+                transform: translateY(3px);
+                background: #eef6fc;
+            }
+
+            100% {
+                transform: translateY(0);
+                background: #f7f8f9;
+            }
+        }
+
+        .vencimento-item .label {
+            display: block;
+            font-size: 12px;
+            color: #777;
+            margin-bottom: 6px
+        }
+
+        .vencimento-item .value {
+            font-size: 23px;
+            font-weight: bold;
+            color: #222
+        }
+
+        .vencimento-item .dias-label {
+            display: block;
+            margin-top: 10px;
+            padding-top: 9px;
+            border-top: 1px solid #e3e6e8;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .45px;
+            color: #92989d;
+        }
+
+        .vencimento-item .dias-value {
+            display: block;
+            margin-top: 3px;
+            font-size: 14px;
+            line-height: 1.3;
+            font-weight: 700;
+            color: #4b5560;
+        }
+
+        .vencimento-item.sem-vencidas {
+            opacity: .62;
+        }
+
+        .vencimento-item.sem-vencidas .dias-value {
+            font-weight: 600;
+            color: #8a9299;
+        }
+
+        .total-vencidas .value {
+            font-size: 34px;
+            font-weight: 800;
+            color: #e74c3c;
+            line-height: 1;
+        }
+
+        .total-vencidas .label {
+            font-size: 15px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .total-vencidas {
+            border-left: 4px solid #e74c3c;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 17px;
+        }
+
+        .amarela-vencida {
+            border-left: 4px solid #f1c40f
+        }
+
+        .vermelha-vencida {
+            border-left: 4px solid #e74c3c
+        }
+
+        .nd-vencida {
+            border-left: 4px solid #7f8c8d
+        }
+
+        .programado-item {
+            border-left: 4px solid #3498db;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 17px;
+            min-height: 118px;
+        }
+
+        .andamento-item {
+            border-left: 4px solid #2ecc71;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 17px;
+            min-height: 118px;
+        }
+
+        .programado-item .label,
+        .andamento-item .label {
+            font-size: 15px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .programado-item .value,
+        .andamento-item .value {
+            font-size: 34px;
+            font-weight: 800;
+            line-height: 1;
+            color: #222;
+        }
+
+        .amarela-vencida,
+        .vermelha-vencida,
+        .nd-vencida {
+            padding: 17px;
+        }
+
+        .amarela-vencida .label,
+        .vermelha-vencida .label,
+        .nd-vencida .label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #5f666d;
+        }
+
+        .amarela-vencida .value,
+        .vermelha-vencida .value,
+        .nd-vencida .value {
+            font-size: 27px;
+            font-weight: 750;
+            line-height: 1.1;
+        }
+
+        .amarela-vencida .dias-label,
+        .vermelha-vencida .dias-label,
+        .nd-vencida .dias-label {
+            font-size: 12px;
+            margin-top: 12px;
+        }
+
+        .amarela-vencida .dias-value,
+        .vermelha-vencida .dias-value,
+        .nd-vencida .dias-value {
+            font-size: 16px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .vencimento-hint {
+            padding: 0 22px 17px;
+            color: #888;
+            font-size: 12px
+        }
+
+        .table-container {
+            background: #fff;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+            overflow-x: auto
+        }
+
+        .table-container h2 {
+            font-size: 20px;
+            margin-bottom: 18px
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px
+        }
+
+        th,
+        td {
+            padding: 12px 14px;
+            text-align: center;
+            border-bottom: 1px solid #eee
+        }
+
+        th {
+            background: #f5f5f5;
+            font-weight: bold;
+            color: #444
+        }
+
+        td:first-child,
+        th:first-child {
+            text-align: left
+        }
+
+        tr:hover {
+            background: #fafafa
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold
+        }
+
+        .badge-yellow {
+            background: #fff3b0;
+            color: #7d6500
+        }
+
+        .badge-red {
+            background: #ffd6d2;
+            color: #a32920
+        }
+
+        .badge-gray {
+            background: #e5e7e9;
+            color: #555
+        }
+
+        @media(max-width:900px) {
+            .cards {
+                grid-template-columns: repeat(2, 1fr)
+            }
+
+            .vencimento-grid {
+                grid-template-columns: repeat(2, 1fr)
+            }
+
+            .status-grid {
+                grid-template-columns: repeat(2, 1fr)
+            }
+        }
+
+        @media(max-width:600px) {
+            .container {
+                padding: 15px
+            }
+
+            .cards {
+                grid-template-columns: 1fr
+            }
+
+            .chart-wrapper {
+                height: 400px
+            }
+
+            header {
+                align-items: flex-start;
+                gap: 12px
+            }
+
+            .logo {
+                width: min(300px, 82vw);
+                height: auto
+            }
+
+            header h1 {
+                font-size: 23px
+            }
+
+            .vencimento-grid {
+                grid-template-columns: 1fr
+            }
+
+            .status-grid {
+                grid-template-columns: 1fr
+            }
+
+            .vencimento-panel.aberto {
+                max-height: 1600px;
+            }
+
+            .status-section {
+                margin: 8px 18px 0;
+                padding-top: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-box">
+                <img class="logo" src="C:\Users\dufel\Downloads\logo-pag (1) (1).png" alt="Logo">
+            </div>
+
+            <div class="header-text">
+                <h1>Notas de Manutenção de Embalagem</h1>
+            </div>
+        </header>
+        <section class="cards">
+            <div class="card yellow">
+                <div class="card-title">Notas Amarelas</div>
+                <div class="card-value">40</div>
+            </div>
+            <div class="card red">
+                <div class="card-title">Notas Vermelhas</div>
+                <div class="card-value">147</div>
+            </div>
+            <div class="card gray">
+                <div class="card-title">ND</div>
+                <div class="card-value">143</div>
+            </div>
+            <div class="card total">
+                <div class="card-title">Total Geral</div>
+                <div class="card-value">330</div>
+            </div>
+        </section>
+        <section class="chart-container">
+            <div class="chart-header">
+                <h2>Distribuição das notas por linha</h2>
+            </div>
+            <div class="chart-wrapper"><canvas id="notasChart"></canvas></div>
+        </section>
+        <section id="vencimentoPanel" class="vencimento-panel">
+            <div class="vencimento-header">
+                <h3>Informações de vencimento</h3><span id="linhaSelecionada" class="linha-selecionada">—</span>
+            </div>
+            <div class="vencimento-grid">
+                <div class="vencimento-item total-vencidas">
+                    <span class="label">Total vencidas</span>
+                    <span id="totalVencidas" class="value">0</span>
+                </div>
+
+                <div id="cardAmarela" class="vencimento-item amarela-vencida">
+                    <span class="label">Amarelas vencidas</span>
+                    <span id="amarelaVencida" class="value">0</span>
+                    <span class="dias-label">Tempo vencido</span>
+                    <span id="diasAmarela" class="dias-value">—</span>
+                </div>
+
+                <div id="cardVermelha" class="vencimento-item vermelha-vencida">
+                    <span class="label">Vermelhas vencidas</span>
+                    <span id="vermelhaVencida" class="value">0</span>
+                    <span class="dias-label">Tempo vencido</span>
+                    <span id="diasVermelha" class="dias-value">—</span>
+                </div>
+
+                <div id="cardNd" class="vencimento-item nd-vencida">
+                    <span class="label">ND vencidas</span>
+                    <span id="ndVencida" class="value">0</span>
+                    <span class="dias-label">Tempo vencido</span>
+                    <span id="diasNd" class="dias-value">—</span>
+                </div>
+
+            </div>
+
+            <div class="status-section">
+                <div class="status-section-title">Status operacional</div>
+                <div class="status-grid">
+                    <div class="vencimento-item programado-item">
+                        <span class="label">Programado</span>
+                        <span id="programado" class="value">0</span>
+                    </div>
+
+                    <div class="vencimento-item andamento-item">
+                        <span class="label">Material em Andamento</span>
+                        <span id="materialAndamento" class="value">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="vencimento-hint">O período mostra há quantos dias as notas estão vencidas. Quando houver mais de
+                uma nota, é exibida a faixa do menor ao maior atraso.</div>
+        </section>
+        <section class="table-container">
+            <h2>Detalhamento por linha</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Classificação</th>
+                        <th>Linha 1</th>
+                        <th>Linha 2</th>
+                        <th>Linha 3</th>
+                        <th>Linha 4</th>
+                        <th>Linha 5</th>
+                        <th>Linha 6</th>
+                        <th>Linha 7</th>
+                        <th>Linha 8</th>
+                        <th>Linha 9</th>
+                        <th>Linha 10</th>
+                        <th>Linha 14</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge badge-yellow">Amarela</span></td>
+                        <td>1</td>
+                        <td>2</td>
+                        <td>6</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>14</td>
+                        <td>9</td>
+                        <td>3</td>
+                        <td>4</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-red">Vermelha</span></td>
+                        <td>2</td>
+                        <td>0</td>
+                        <td>46</td>
+                        <td>12</td>
+                        <td>0</td>
+                        <td>3</td>
+                        <td>5</td>
+                        <td>39</td>
+                        <td>34</td>
+                        <td>6</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-gray">ND</span></td>
+                        <td>4</td>
+                        <td>6</td>
+                        <td>26</td>
+                        <td>24</td>
+                        <td>6</td>
+                        <td>15</td>
+                        <td>1</td>
+                        <td>40</td>
+                        <td>0</td>
+                        <td>11</td>
+                        <td>10</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </div>
+    <script>
+        const labels = ['Linha 1', 'Linha 2', 'Linha 3', 'Linha 4', 'Linha 5', 'Linha 6', 'Linha 7', 'Linha 8', 'Linha 9', 'Linha 10', 'Linha 14'];
+        const atuais = {amarela: [1, 2, 6, 1, 0, 0, 0, 14, 9, 3, 4], vermelha: [2, 0, 46, 12, 0, 3, 5, 39, 34, 6, 0], nd: [4, 6, 26, 24, 6, 15, 1, 40, 0, 11, 10]};
+        // Ordem: Linha 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 e 14.
+        const vencidas = {
+            amarela: [0, 2, 5, 0, 0, 0, 0, 11, 4, 2, 3],
+            vermelha: [2, 0, 32, 4, 0, 1, 3, 21, 8, 0, 0],
+            nd: [0, 1, 6, 4, 3, 2, 1, 13, 0, 3, 0]
+        };
+
+        // Faixa de dias vencidos por categoria. Use "—" quando não houver nota vencida.
+        // Para uma única idade, use por exemplo "118 dias". Para várias, use "32 a 68 dias".
+        const diasPorCategoria = {
+            amarela: ['—', '32 a 68 dias', '18 a 38 dias', '—', '—', '—', '—', '4 a 213 dias', '3 a 86 dias', '17 a 170 dias', '32 a 56 dias'],
+            vermelha: ['45 a 66 dias', '—', '1 a 200 dias', '11 a 200 dias', '—', '4 dias', '146 dias', '3 a 200 dias', '3 a 135 dias', '—', '—'],
+            nd: ['—', '118 dias', '44 a 244 dias', '29 a 119 dias', '84 a 151 dias', '172 dias', '319 dias', '24 a 280 dias', '—', '6 a 59 dias', '—']
+        };
+
+        // Ordem: Linha 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 e 14.
+        const programado = [9, 1, 1, 13, 2, 3, 0, 16, 3, 3, 0];
+        const materialAndamento = [0, 2, 1, 0, 2, 0, 5, 0, 0, 2, 7];
+        const panel = document.getElementById('vencimentoPanel');
+        const linhaSelecionada = document.getElementById('linhaSelecionada');
+        let indiceSelecionado = -1;
+        let timerAtualizacao;
+
+        // Realça no gráfico a LB que está sendo observada no momento.
+        const destaqueLinhaPlugin = {
+            id: 'destaqueLinha',
+            beforeDatasetsDraw(chart) {
+                if (indiceSelecionado < 0) return;
+                const {ctx, chartArea, scales} = chart;
+                const x = scales.x;
+                const centro = x.getPixelForValue(indiceSelecionado);
+                const anterior = indiceSelecionado > 0 ? x.getPixelForValue(indiceSelecionado - 1) : centro - (x.getPixelForValue(1) - centro);
+                const proximo = indiceSelecionado < labels.length - 1 ? x.getPixelForValue(indiceSelecionado + 1) : centro + (centro - x.getPixelForValue(indiceSelecionado - 1));
+                const largura = Math.min(Math.abs(proximo - centro), Math.abs(centro - anterior)) * .82;
+
+                ctx.save();
+                ctx.fillStyle = 'rgba(52, 152, 219, .09)';
+                ctx.strokeStyle = 'rgba(52, 152, 219, .40)';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.roundRect(centro - largura / 2, chartArea.top, largura, chartArea.bottom - chartArea.top, 8);
+                ctx.fill();
+                ctx.stroke();
+                ctx.restore();
+            }
+        };
+
+        function atualizarVencimento(i) {
+            if (i === indiceSelecionado) return;
+            indiceSelecionado = i;
+            chart.draw();
+
+            panel.classList.add('atualizando');
+            linhaSelecionada.classList.add('trocando');
+            clearTimeout(timerAtualizacao);
+
+            timerAtualizacao = setTimeout(() => {
+                const a = vencidas.amarela[i];
+                const v = vencidas.vermelha[i];
+                const n = vencidas.nd[i];
+
+                linhaSelecionada.textContent = labels[i];
+                document.getElementById('totalVencidas').textContent = a + v + n;
+                document.getElementById('amarelaVencida').textContent = a;
+                document.getElementById('vermelhaVencida').textContent = v;
+                document.getElementById('ndVencida').textContent = n;
+
+                document.getElementById('programado').textContent = programado[i];
+                document.getElementById('materialAndamento').textContent =
+                    materialAndamento[i] === null ? '—' : materialAndamento[i];
+
+                document.getElementById('diasAmarela').textContent = a ? diasPorCategoria.amarela[i] : 'Sem vencidas';
+                document.getElementById('diasVermelha').textContent = v ? diasPorCategoria.vermelha[i] : 'Sem vencidas';
+                document.getElementById('diasNd').textContent = n ? diasPorCategoria.nd[i] : 'Sem vencidas';
+
+                document.getElementById('cardAmarela').classList.toggle('sem-vencidas', a === 0);
+                document.getElementById('cardVermelha').classList.toggle('sem-vencidas', v === 0);
+                document.getElementById('cardNd').classList.toggle('sem-vencidas', n === 0);
+
+                panel.classList.add('aberto');
+                panel.classList.remove('atualizando');
+                panel.classList.remove('pulso');
+                void panel.offsetWidth;
+                panel.classList.add('pulso');
+                linhaSelecionada.classList.remove('trocando');
+            }, 120);
+        }
+
+        const chart = new Chart(document.getElementById('notasChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [
+                    {label: 'Amarela', data: atuais.amarela, backgroundColor: '#f1c40f'},
+                    {label: 'Vermelha', data: atuais.vermelha, backgroundColor: '#e74c3c'},
+                    {label: 'ND', data: atuais.nd, backgroundColor: '#7f8c8d'}
+                ]
+            },
+            plugins: [destaqueLinhaPlugin],
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {mode: 'index', intersect: false},
+                plugins: {
+                    legend: {position: 'top'},
+                    tooltip: {callbacks: {afterBody: () => []}}
+                },
+                scales: {
+                    x: {stacked: true, title: {display: true, text: ''}},
+                    y: {stacked: true, beginAtZero: true, title: {display: true, text: 'Quantidade de notas'}, ticks: {stepSize: 10}}
+                },
+                onHover: function (event, elements) {
+                    if (!elements.length) return;
+                    atualizarVencimento(elements[0].index);
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
