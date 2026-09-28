@@ -1,1 +1,3650 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notas de Manutenção de Embalagem</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f6f8;
+            color: #333
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: auto;
+            padding: 10px 30px 30px;
+        }
+
+        header {
+            margin-bottom: 18px;
+        }
+
+        .logo {
+            display: block;
+            width: 200px;
+            height: auto;
+            object-fit: contain;
+            margin-left: 0px;
+            margin-bottom: 35px;
+        }
+
+        .header-text {
+            min-width: 0;
+        }
+
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 6px;
+            color: #222
+        }
+
+        header p {
+            color: #666;
+            font-size: 15px
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 25px
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .08)
+        }
+
+        .card-title {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 8px
+        }
+
+        .card-value {
+            font-size: 30px;
+            font-weight: bold;
+            color: #222
+        }
+
+        .yellow {
+            border-left: 5px solid #f1c40f
+        }
+
+        .red {
+            border-left: 5px solid #e74c3c
+        }
+
+        .gray {
+            border-left: 5px solid #7f8c8d
+        }
+
+        .total {
+            border-left: 5px solid #3498db
+        }
+
+        .chart-container {
+            background: #fff;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+            margin-bottom: 18px
+        }
+
+        .chart-header {
+            margin-bottom: 20px
+        }
+
+        .chart-header h2 {
+            font-size: 20px;
+            margin-bottom: 5px
+        }
+
+        .chart-header p {
+            color: #777;
+            font-size: 14px
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 500px
+        }
+
+        .vencimento-panel {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+            margin-bottom: 25px;
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transform: translateY(-8px);
+            transition: max-height .3s ease, opacity .25s ease, transform .3s ease
+        }
+
+        .vencimento-panel.aberto {
+            max-height: 760px;
+            opacity: 1;
+            transform: translateY(0)
+        }
+
+        .vencimento-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 22px;
+            border-bottom: 1px solid #eee
+        }
+
+        .vencimento-header h3 {
+            font-size: 17px;
+            color: #222
+        }
+
+        .linha-selecionada {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 76px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: .4px;
+            color: #fff;
+            background: #3498db;
+            box-shadow: 0 5px 14px rgba(52, 152, 219, .28);
+            transform: scale(1);
+            transition: transform .18s ease, box-shadow .18s ease, background .18s ease
+        }
+
+        .linha-selecionada.trocando {
+            transform: scale(1.09);
+            box-shadow: 0 7px 18px rgba(52, 152, 219, .38)
+        }
+
+        .vencimento-grid {
+            display: grid;
+            grid-template-columns: 1.05fr repeat(3, 1fr);
+            gap: 12px;
+            padding: 18px 22px 14px;
+            transition: opacity .16s ease, transform .16s ease
+        }
+
+        .status-section {
+            margin: 4px 22px 0;
+            padding: 18px 0 14px;
+            border-top: 1px solid #e2e6e9;
+        }
+
+        .status-section-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            color: #8b949c;
+            margin-bottom: 12px;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .vencimento-panel.atualizando .vencimento-grid {
+            opacity: .35;
+            transform: translateY(5px)
+        }
+
+        .vencimento-item {
+            border-radius: 8px;
+            padding: 14px;
+            background: #f7f8f9;
+            border: 1px solid #e8eaec;
+            transition: transform .2s ease, box-shadow .2s ease, background .2s ease
+        }
+
+        .vencimento-panel.pulso .vencimento-item {
+            animation: vencimentoPulso .36s ease
+        }
+
+        @keyframes vencimentoPulso {
+            0% {
+                transform: translateY(3px);
+                background: #eef6fc;
+            }
+
+            100% {
+                transform: translateY(0);
+                background: #f7f8f9;
+            }
+        }
+
+        .vencimento-item .label {
+            display: block;
+            font-size: 12px;
+            color: #777;
+            margin-bottom: 6px
+        }
+
+        .vencimento-item .value {
+            font-size: 23px;
+            font-weight: bold;
+            color: #222
+        }
+
+        .vencimento-item .dias-label {
+            display: block;
+            margin-top: 10px;
+            padding-top: 9px;
+            border-top: 1px solid #e3e6e8;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .45px;
+            color: #92989d;
+        }
+
+        .vencimento-item .dias-value {
+            display: block;
+            margin-top: 3px;
+            font-size: 14px;
+            line-height: 1.3;
+            font-weight: 700;
+            color: #4b5560;
+        }
+
+        .vencimento-item.sem-vencidas {
+            opacity: .62;
+        }
+
+        .vencimento-item.sem-vencidas .dias-value {
+            font-weight: 600;
+            color: #8a9299;
+        }
+
+        .total-vencidas .value {
+            font-size: 34px;
+            font-weight: 800;
+            color: #e74c3c;
+            line-height: 1;
+        }
+
+        .total-vencidas .label {
+            font-size: 15px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .total-vencidas {
+            border-left: 4px solid #e74c3c;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 17px;
+        }
+
+        .amarela-vencida {
+            border-left: 4px solid #f1c40f
+        }
+
+        .vermelha-vencida {
+            border-left: 4px solid #e74c3c
+        }
+
+        .nd-vencida {
+            border-left: 4px solid #7f8c8d
+        }
+
+        .programado-item {
+            border-left: 4px solid #3498db;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 17px;
+            min-height: 118px;
+        }
+
+        .andamento-item {
+            border-left: 4px solid #2ecc71;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 17px;
+            min-height: 118px;
+        }
+
+        .programado-item .label,
+        .andamento-item .label {
+            font-size: 15px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .programado-item .value,
+        .andamento-item .value {
+            font-size: 34px;
+            font-weight: 800;
+            line-height: 1;
+            color: #222;
+        }
+
+        .amarela-vencida,
+        .vermelha-vencida,
+        .nd-vencida {
+            padding: 17px;
+        }
+
+        .amarela-vencida .label,
+        .vermelha-vencida .label,
+        .nd-vencida .label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #5f666d;
+        }
+
+        .amarela-vencida .value,
+        .vermelha-vencida .value,
+        .nd-vencida .value {
+            font-size: 27px;
+            font-weight: 750;
+            line-height: 1.1;
+        }
+
+        .amarela-vencida .dias-label,
+        .vermelha-vencida .dias-label,
+        .nd-vencida .dias-label {
+            font-size: 12px;
+            margin-top: 12px;
+        }
+
+        .amarela-vencida .dias-value,
+        .vermelha-vencida .dias-value,
+        .nd-vencida .dias-value {
+            font-size: 16px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .vencimento-hint {
+            padding: 0 22px 17px;
+            color: #888;
+            font-size: 12px
+        }
+
+        .table-container {
+            background: #fff;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+            overflow-x: auto
+        }
+
+        .table-container h2 {
+            font-size: 20px;
+            margin-bottom: 18px
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px
+        }
+
+        th,
+        td {
+            padding: 12px 14px;
+            text-align: center;
+            border-bottom: 1px solid #eee
+        }
+
+        th {
+            background: #f5f5f5;
+            font-weight: bold;
+            color: #444
+        }
+
+        td:first-child,
+        th:first-child {
+            text-align: left
+        }
+
+        tr:hover {
+            background: #fafafa
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold
+        }
+
+        .badge-yellow {
+            background: #fff3b0;
+            color: #7d6500
+        }
+
+        .badge-red {
+            background: #ffd6d2;
+            color: #a32920
+        }
+
+        .badge-gray {
+            background: #e5e7e9;
+            color: #555
+        }
+
+        @media(max-width:900px) {
+            .cards {
+                grid-template-columns: repeat(2, 1fr)
+            }
+
+            .vencimento-grid {
+                grid-template-columns: repeat(2, 1fr)
+            }
+
+            .status-grid {
+                grid-template-columns: repeat(2, 1fr)
+            }
+        }
+
+        @media(max-width:600px) {
+            .container {
+                padding: 15px
+            }
+
+            .cards {
+                grid-template-columns: 1fr
+            }
+
+            .chart-wrapper {
+                height: 400px
+            }
+
+            header {
+                align-items: flex-start;
+                gap: 12px
+            }
+
+            .logo {
+                width: min(300px, 82vw);
+                height: auto
+            }
+
+            header h1 {
+                font-size: 23px
+            }
+
+            .vencimento-grid {
+                grid-template-columns: 1fr
+            }
+
+            .status-grid {
+                grid-template-columns: 1fr
+            }
+
+            .vencimento-panel.aberto {
+                max-height: 1600px;
+            }
+
+            .status-section {
+                margin: 8px 18px 0;
+                padding-top: 18px;
+            }
+        }
+
+        /* =========================================================
+           MODO ADMIN
+        ========================================================= */
+        
+        .admin-only {
+            display: none;
+        }
+        
+        /*
+        Quando o JavaScript detectar que há um administrador
+        autenticado, ele adicionará:
+        
+        <body class="admin-mode">
+        
+        e os controles aparecem.
+        */
+        
+        body.admin-mode .admin-only {
+            display: flex;
+        }
+        
+        
+        /* Badge de administrador */
+        
+        .header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        
+        .admin-badge {
+            align-items: center;
+            justify-content: center;
+        
+            padding: 7px 12px;
+        
+            border-radius: 999px;
+        
+            font-size: 12px;
+            font-weight: 700;
+        
+            color: #1769aa;
+        
+            background: #eaf4fc;
+        
+            border: 1px solid #cbe5f8;
+        }
+        
+        
+        /* Pequena indicação administrativa */
+        
+        .admin-hint {
+            align-items: center;
+        
+            font-size: 12px;
+            font-weight: 600;
+        
+            color: #777;
+        }
+        
+        
+        /* =========================================================
+           BOTÃO DE EDIÇÃO
+        ========================================================= */
+        
+        .vencimento-item {
+            position: relative;
+        }
+        
+        .edit-btn {
+            position: absolute;
+        
+            top: 10px;
+            right: 10px;
+        
+            width: 31px;
+            height: 31px;
+        
+            align-items: center;
+            justify-content: center;
+        
+            padding: 0;
+        
+            border: 1px solid #dce2e7;
+            border-radius: 8px;
+        
+            background: #fff;
+        
+            color: #66727d;
+        
+            font-size: 18px;
+            line-height: 1;
+        
+            cursor: pointer;
+        
+            box-shadow: 0 2px 5px rgba(0, 0, 0, .06);
+        
+            transition:
+                background .18s ease,
+                color .18s ease,
+                border-color .18s ease,
+                transform .18s ease,
+                box-shadow .18s ease;
+        }
+        
+        
+        .edit-btn:hover {
+            color: #2980b9;
+        
+            background: #f5faff;
+        
+            border-color: #bcdcf3;
+        
+            box-shadow: 0 3px 8px rgba(0, 0, 0, .10);
+        
+            transform: translateY(-1px);
+        }
+        
+        
+        .edit-btn:active {
+            transform: translateY(0);
+        }
+        
+        
+        /* Botão menor perto do "Tempo vencido" */
+        
+        .dias-container {
+            position: relative;
+        }
+        
+        .edit-btn-small {
+            top: 7px;
+            right: 0;
+        
+            width: 27px;
+            height: 27px;
+        
+            font-size: 15px;
+        }
+        
+        
+        /*
+        Reserva espaço para o lápis para ele não ficar
+        em cima do título do cartão.
+        */
+        
+        body.admin-mode .vencimento-item > .label {
+            padding-right: 38px;
+        }
+        
+        
+        /* =========================================================
+           ADMIN NA TABELA
+        ========================================================= */
+        
+        .table-header {
+            display: flex;
+        
+            align-items: center;
+            justify-content: space-between;
+        
+            gap: 15px;
+        
+            margin-bottom: 18px;
+        }
+        
+        .table-header h2 {
+            margin-bottom: 0;
+        }
+        
+        
+        /*
+        No modo administrativo deixa claro que as células
+        podem ser manipuladas.
+        */
+        
+        body.admin-mode #detalhamentoBody td[data-field] {
+            position: relative;
+        
+            cursor: pointer;
+        
+            transition:
+                background .15s ease,
+                box-shadow .15s ease;
+        }
+        
+        body.admin-mode #detalhamentoBody td[data-field]:hover {
+            background: #eef7fd;
+        
+            box-shadow:
+                inset 0 0 0 1px #c6e3f7;
+        }
+        
+        
+        /* Lápis que poderá ser criado pelo JavaScript
+           dentro das células */
+        
+        .table-edit-btn {
+            margin-left: 7px;
+        
+            border: none;
+        
+            background: transparent;
+        
+            color: #7b8791;
+        
+            font-size: 13px;
+        
+            cursor: pointer;
+        }
+        
+        .table-edit-btn:hover {
+            color: #2980b9;
+        }
+        
+        
+        /* =========================================================
+           RESPONSIVO
+        ========================================================= */
+        
+        @media(max-width: 600px) {
+        
+            .header-row {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 8px;
+            }
+        
+            .admin-badge {
+                align-self: flex-start;
+            }
+        
+            .table-header {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 5px;
+            }
+        
+            .edit-btn {
+                width: 29px;
+                height: 29px;
+        
+                top: 8px;
+                right: 8px;
+        
+                font-size: 16px;
+            }
+        
+        }
+
+      .login-admin {
+          position: fixed;
+          inset: 0;
+      
+          display: flex;
+          align-items: center;
+          justify-content: center;
+      
+          background: #f4f6f8;
+      
+          z-index: 9999;
+      }
+      
+      .login-admin.oculto {
+          display: none;
+      }
+      
+      .login-box {
+          width: min(380px, 90vw);
+      
+          padding: 28px;
+      
+          background: #fff;
+      
+          border-radius: 12px;
+      
+          box-shadow:
+              0 8px 30px rgba(0, 0, 0, .12);
+      }
+      
+      .login-box h2 {
+          margin-bottom: 20px;
+      }
+      
+      .login-box input {
+          width: 100%;
+      
+          padding: 12px 14px;
+      
+          margin-bottom: 12px;
+      
+          border: 1px solid #ddd;
+          border-radius: 8px;
+      
+          font-size: 15px;
+      }
+      
+      .login-box button {
+          width: 100%;
+      
+          padding: 12px;
+      
+          border: none;
+          border-radius: 8px;
+      
+          background: #3498db;
+          color: #fff;
+      
+          font-size: 15px;
+          font-weight: 700;
+      
+          cursor: pointer;
+      }
+
+        .login-admin.oculto {
+            display: none;
+        }
+        
+        .login-texto {
+            margin-bottom: 18px;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+     <!-- CRIAR SENHA APÓS O CONVITE -->
+    <div id="criarSenhaAdmin" class="login-admin oculto">
+
+        <div class="login-box">
+
+            <h2>Definir senha</h2>
+
+            <p class="login-texto">
+                Crie uma senha para acessar a área administrativa.
+            </p>
+
+            <input
+                id="novaSenhaAdmin"
+                type="password"
+                placeholder="Nova senha">
+
+            <input
+                id="confirmarSenhaAdmin"
+                type="password"
+                placeholder="Confirmar senha">
+
+            <button
+                id="btnCriarSenhaAdmin"
+                type="button">
+                Salvar senha
+            </button>
+
+        </div>
+
+    </div>
+
+    
+    <!-- =========================================
+         LOGIN ADMIN
+    ========================================== -->
+    <div id="loginAdmin" class="login-admin">
+
+        <div class="login-box">
+
+            <h2>Administração</h2>
+
+            <input
+                id="adminEmail"
+                type="email"
+                placeholder="E-mail">
+
+            <input
+                id="adminSenha"
+                type="password"
+                placeholder="Senha">
+
+            <button
+                id="btnLoginAdmin"
+                type="button">
+                Entrar
+            </button>
+
+        </div>
+
+    </div>
+  
+    <div class="container">
+        <!-- =========================================
+             CABEÇALHO
+        ========================================== -->
+        <header>
+            <div class="logo-box">
+                <img class="logo" src="logo.png" alt="Logo">
+            </div>
+    
+            <div class="header-row">
+                <div class="header-text">
+                    <h1>Notas de Manutenção de Embalagem</h1>
+                </div>
+    
+                <!-- Só aparece no modo admin -->
+                <div id="adminBadge" class="admin-badge admin-only">
+                    Modo administrador
+                </div>
+            </div>
+        </header>
+    
+    
+        <!-- =========================================
+             TOTAIS GERAIS
+             Estes valores serão calculados pelo JS.
+        ========================================== -->
+        <section class="cards">
+    
+            <div class="card yellow">
+                <div class="card-title">Notas Amarelas</div>
+                <div id="totalAmarela" class="card-value">0</div>
+            </div>
+    
+            <div class="card red">
+                <div class="card-title">Notas Vermelhas</div>
+                <div id="totalVermelha" class="card-value">0</div>
+            </div>
+    
+            <div class="card gray">
+                <div class="card-title">ND</div>
+                <div id="totalNd" class="card-value">0</div>
+            </div>
+    
+            <div class="card total">
+                <div class="card-title">Total Geral</div>
+                <div id="totalGeral" class="card-value">0</div>
+            </div>
+    
+        </section>
+    
+    
+        <!-- =========================================
+             GRÁFICO
+        ========================================== -->
+        <section class="chart-container">
+    
+            <div class="chart-header">
+    
+                <div>
+                    <h2>Distribuição das notas por linha</h2>
+                </div>
+    
+                <div class="admin-hint admin-only">
+                    Selecione uma linha para editar seus dados
+                </div>
+    
+            </div>
+    
+            <div class="chart-wrapper">
+                <canvas id="notasChart"></canvas>
+            </div>
+    
+        </section>
+    
+    
+        <!-- =========================================
+             PAINEL DE VENCIMENTO
+        ========================================== -->
+        <section id="vencimentoPanel" class="vencimento-panel">
+    
+            <div class="vencimento-header">
+    
+                <h3>Informações de vencimento</h3>
+    
+                <span
+                    id="linhaSelecionada"
+                    class="linha-selecionada">
+                    —
+                </span>
+    
+            </div>
+    
+    
+            <div class="vencimento-grid">
+    
+                <!-- TOTAL VENCIDAS -->
+                <div class="vencimento-item total-vencidas">
+    
+                    <span class="label">
+                        Total vencidas
+                    </span>
+    
+                    <span
+                        id="totalVencidas"
+                        class="value">
+                        0
+                    </span>
+    
+                    <!-- Não tem lápis:
+                         total é calculado automaticamente -->
+    
+                </div>
+    
+    
+                <!-- AMARELAS -->
+                <div
+                    id="cardAmarela"
+                    class="vencimento-item amarela-vencida">
+    
+                    <button
+                        type="button"
+                        class="edit-btn admin-only"
+                        data-field="amarela_vencida"
+                        data-label="Amarelas vencidas"
+                        aria-label="Editar amarelas vencidas">
+                        ✎
+                    </button>
+    
+                    <span class="label">
+                        Amarelas vencidas
+                    </span>
+    
+                    <span
+                        id="amarelaVencida"
+                        class="value">
+                        0
+                    </span>
+    
+    
+                    <div class="dias-container">
+    
+                        <span class="dias-label">
+                            Tempo vencido
+                        </span>
+    
+                        <span
+                            id="diasAmarela"
+                            class="dias-value">
+                            —
+                        </span>
+    
+                        <button
+                            type="button"
+                            class="edit-btn edit-btn-small admin-only"
+                            data-field="dias_amarela"
+                            data-label="Tempo vencido - Amarela"
+                            aria-label="Editar tempo vencido das amarelas">
+                            ✎
+                        </button>
+    
+                    </div>
+    
+                </div>
+    
+    
+                <!-- VERMELHAS -->
+                <div
+                    id="cardVermelha"
+                    class="vencimento-item vermelha-vencida">
+    
+                    <button
+                        type="button"
+                        class="edit-btn admin-only"
+                        data-field="vermelha_vencida"
+                        data-label="Vermelhas vencidas"
+                        aria-label="Editar vermelhas vencidas">
+                        ✎
+                    </button>
+    
+                    <span class="label">
+                        Vermelhas vencidas
+                    </span>
+    
+                    <span
+                        id="vermelhaVencida"
+                        class="value">
+                        0
+                    </span>
+    
+    
+                    <div class="dias-container">
+    
+                        <span class="dias-label">
+                            Tempo vencido
+                        </span>
+    
+                        <span
+                            id="diasVermelha"
+                            class="dias-value">
+                            —
+                        </span>
+    
+                        <button
+                            type="button"
+                            class="edit-btn edit-btn-small admin-only"
+                            data-field="dias_vermelha"
+                            data-label="Tempo vencido - Vermelha"
+                            aria-label="Editar tempo vencido das vermelhas">
+                            ✎
+                        </button>
+    
+                    </div>
+    
+                </div>
+    
+    
+                <!-- ND -->
+                <div
+                    id="cardNd"
+                    class="vencimento-item nd-vencida">
+    
+                    <button
+                        type="button"
+                        class="edit-btn admin-only"
+                        data-field="nd_vencida"
+                        data-label="ND vencidas"
+                        aria-label="Editar ND vencidas">
+                        ✎
+                    </button>
+    
+                    <span class="label">
+                        ND vencidas
+                    </span>
+    
+                    <span
+                        id="ndVencida"
+                        class="value">
+                        0
+                    </span>
+    
+    
+                    <div class="dias-container">
+    
+                        <span class="dias-label">
+                            Tempo vencido
+                        </span>
+    
+                        <span
+                            id="diasNd"
+                            class="dias-value">
+                            —
+                        </span>
+    
+                        <button
+                            type="button"
+                            class="edit-btn edit-btn-small admin-only"
+                            data-field="dias_nd"
+                            data-label="Tempo vencido - ND"
+                            aria-label="Editar tempo vencido das ND">
+                            ✎
+                        </button>
+    
+                    </div>
+    
+                </div>
+    
+            </div>
+    
+    
+            <!-- =====================================
+                 STATUS OPERACIONAL
+            ====================================== -->
+            <div class="status-section">
+    
+                <div class="status-section-title">
+                    Status operacional
+                </div>
+    
+                <div class="status-grid">
+    
+    
+                    <!-- PROGRAMADO / PREVENTIVA -->
+                    <div
+                        id="cardProgramado"
+                        class="vencimento-item programado-item">
+    
+                        <button
+                            id="editarProgramado"
+                            type="button"
+                            class="edit-btn admin-only"
+                            data-field="programado"
+                            data-label="Programado"
+                            aria-label="Editar programado">
+                            ✎
+                        </button>
+    
+                        <span
+                            id="programadoLabel"
+                            class="label">
+                            Programado
+                        </span>
+    
+                        <span
+                            id="programado"
+                            class="value">
+                            0
+                        </span>
+    
+                    </div>
+    
+    
+                    <!-- MATERIAL EM ANDAMENTO -->
+                    <div
+                        id="cardMaterialAndamento"
+                        class="vencimento-item andamento-item">
+    
+                        <button
+                            type="button"
+                            class="edit-btn admin-only"
+                            data-field="material_andamento"
+                            data-label="Material em Andamento"
+                            aria-label="Editar material em andamento">
+                            ✎
+                        </button>
+    
+                        <span class="label">
+                            Material em Andamento
+                        </span>
+    
+                        <span
+                            id="materialAndamento"
+                            class="value">
+                            0
+                        </span>
+    
+                    </div>
+    
+                </div>
+    
+            </div>
+    
+    
+            <div class="vencimento-hint">
+                O período mostra há quantos dias as notas estão vencidas.
+                Quando houver mais de uma nota, é exibida a faixa do menor
+                ao maior atraso.
+            </div>
+    
+        </section>
+    
+    
+        <!-- =========================================
+             DETALHAMENTO
+        ========================================== -->
+        <section class="table-container">
+    
+            <div class="table-header">
+    
+                <h2>Detalhamento por linha</h2>
+    
+                <span class="admin-hint admin-only">
+                    Clique no lápis para alterar um valor
+                </span>
+    
+            </div>
+    
+    
+            <table>
+    
+                <thead>
+                    <tr>
+                        <th>Classificação</th>
+    
+                        <th>Linha 1</th>
+                        <th>Linha 2</th>
+                        <th>Linha 3</th>
+                        <th>Linha 4</th>
+                        <th>Linha 5</th>
+                        <th>Linha 6</th>
+                        <th>Linha 7</th>
+                        <th>Linha 8</th>
+                        <th>Linha 9</th>
+                        <th>Linha 10</th>
+                        <th>Linha 14</th>
+                    </tr>
+                </thead>
+    
+    
+                <!-- O JavaScript poderá preencher daqui para frente -->
+                <tbody id="detalhamentoBody">
+    
+                    <tr id="rowAmarela">
+    
+                        <td>
+                            <span class="badge badge-yellow">
+                                Amarela
+                            </span>
+                        </td>
+    
+                        <td data-linha="Linha 1" data-field="amarela">0</td>
+                        <td data-linha="Linha 2" data-field="amarela">0</td>
+                        <td data-linha="Linha 3" data-field="amarela">0</td>
+                        <td data-linha="Linha 4" data-field="amarela">0</td>
+                        <td data-linha="Linha 5" data-field="amarela">0</td>
+                        <td data-linha="Linha 6" data-field="amarela">0</td>
+                        <td data-linha="Linha 7" data-field="amarela">0</td>
+                        <td data-linha="Linha 8" data-field="amarela">0</td>
+                        <td data-linha="Linha 9" data-field="amarela">0</td>
+                        <td data-linha="Linha 10" data-field="amarela">0</td>
+                        <td data-linha="Linha 14" data-field="amarela">0</td>
+    
+                    </tr>
+    
+    
+                    <tr id="rowVermelha">
+    
+                        <td>
+                            <span class="badge badge-red">
+                                Vermelha
+                            </span>
+                        </td>
+    
+                        <td data-linha="Linha 1" data-field="vermelha">0</td>
+                        <td data-linha="Linha 2" data-field="vermelha">0</td>
+                        <td data-linha="Linha 3" data-field="vermelha">0</td>
+                        <td data-linha="Linha 4" data-field="vermelha">0</td>
+                        <td data-linha="Linha 5" data-field="vermelha">0</td>
+                        <td data-linha="Linha 6" data-field="vermelha">0</td>
+                        <td data-linha="Linha 7" data-field="vermelha">0</td>
+                        <td data-linha="Linha 8" data-field="vermelha">0</td>
+                        <td data-linha="Linha 9" data-field="vermelha">0</td>
+                        <td data-linha="Linha 10" data-field="vermelha">0</td>
+                        <td data-linha="Linha 14" data-field="vermelha">0</td>
+    
+                    </tr>
+    
+    
+                    <tr id="rowNd">
+    
+                        <td>
+                            <span class="badge badge-gray">
+                                ND
+                            </span>
+                        </td>
+    
+                        <td data-linha="Linha 1" data-field="nd">0</td>
+                        <td data-linha="Linha 2" data-field="nd">0</td>
+                        <td data-linha="Linha 3" data-field="nd">0</td>
+                        <td data-linha="Linha 4" data-field="nd">0</td>
+                        <td data-linha="Linha 5" data-field="nd">0</td>
+                        <td data-linha="Linha 6" data-field="nd">0</td>
+                        <td data-linha="Linha 7" data-field="nd">0</td>
+                        <td data-linha="Linha 8" data-field="nd">0</td>
+                        <td data-linha="Linha 9" data-field="nd">0</td>
+                        <td data-linha="Linha 10" data-field="nd">0</td>
+                        <td data-linha="Linha 14" data-field="nd">0</td>
+    
+                    </tr>
+    
+                </tbody>
+    
+            </table>
+    
+        </section>
+    
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://ynrryvkeicgumwlztkxt.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_ONNugoL6AEat-aGqf9aqKg_XwaToWXQ';
+    
+        const supabaseClient = supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+      // =========================================================
+    // IDENTIFICA SE ESTAMOS NO /admin/
+    // =========================================================
+
+    const PAGINA_ADMIN =
+        window.location.pathname.includes('/admin');
+
+
+    // =========================================================
+    // ADMIN
+    // =========================================================
+
+    let usuarioAdmin = null;
+
+
+    // =========================================================
+    // VERIFICA SE O USUÁRIO VEIO DE UM CONVITE
+    // =========================================================
+
+    function ehFluxoConvite() {
+
+        const parametrosHash =
+            new URLSearchParams(
+                window.location.hash.substring(1)
+            );
+
+        const parametrosQuery =
+            new URLSearchParams(
+                window.location.search
+            );
+
+
+        const tipo =
+            parametrosHash.get('type')
+            ||
+            parametrosQuery.get('type');
+
+
+        return (
+            tipo === 'invite'
+            ||
+            tipo === 'recovery'
+        );
+    }
+
+
+    // =========================================================
+    // VERIFICAR SESSÃO
+    // =========================================================
+
+    async function verificarAdmin() {
+
+        const {
+            data: { session },
+            error
+        } =
+            await supabaseClient.auth.getSession();
+
+
+        if (error) {
+
+            console.error(
+                'Erro ao verificar sessão:',
+                error
+            );
+
+            usuarioAdmin = null;
+
+            return false;
+        }
+
+
+        if (session?.user) {
+
+            usuarioAdmin =
+                session.user;
+
+            return true;
+        }
+
+
+        usuarioAdmin = null;
+
+        return false;
+    }
+
+
+    // =========================================================
+    // INICIAR ÁREA ADMIN
+    // =========================================================
+
+    async function iniciarAdmin() {
+
+        // Página pública
+        if (!PAGINA_ADMIN) {
+
+            document
+                .getElementById('loginAdmin')
+                ?.classList
+                .add('oculto');
+
+
+            document
+                .getElementById('criarSenhaAdmin')
+                ?.classList
+                .add('oculto');
+
+
+            return;
+        }
+
+
+        const autenticado =
+            await verificarAdmin();
+
+
+        const telaLogin =
+            document.getElementById(
+                'loginAdmin'
+            );
+
+
+        const telaCriarSenha =
+            document.getElementById(
+                'criarSenhaAdmin'
+            );
+
+
+        // =====================================================
+        // NÃO ESTÁ AUTENTICADO
+        // =====================================================
+
+        if (!autenticado) {
+
+            document.body.classList.remove(
+                'admin-mode'
+            );
+
+
+            telaCriarSenha
+                ?.classList
+                .add('oculto');
+
+
+            telaLogin
+                ?.classList
+                .remove('oculto');
+
+
+            return;
+        }
+
+
+        // =====================================================
+        // VEIO DE CONVITE
+        // =====================================================
+
+        if (ehFluxoConvite()) {
+
+            document.body.classList.remove(
+                'admin-mode'
+            );
+
+
+            telaLogin
+                ?.classList
+                .add('oculto');
+
+
+            telaCriarSenha
+                ?.classList
+                .remove('oculto');
+
+
+            return;
+        }
+
+
+        // =====================================================
+        // JÁ TEM SESSÃO NORMAL
+        // =====================================================
+
+        telaLogin
+            ?.classList
+            .add('oculto');
+
+
+        telaCriarSenha
+            ?.classList
+            .add('oculto');
+
+
+        document.body.classList.add(
+            'admin-mode'
+        );
+    }
+
+
+    // =========================================================
+    // LOGIN
+    // =========================================================
+
+    async function loginAdmin(
+        email,
+        senha
+    ) {
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient.auth
+                .signInWithPassword({
+                    email: email,
+                    password: senha
+                });
+
+
+        if (error) {
+
+            console.error(
+                'Erro no login:',
+                error
+            );
+
+
+            alert(
+                'E-mail ou senha incorretos.'
+            );
+
+
+            return false;
+        }
+
+
+        usuarioAdmin =
+            data.user;
+
+
+        document.body.classList.add(
+            'admin-mode'
+        );
+
+
+        return true;
+    }
+
+
+    // =========================================================
+    // LOGOUT
+    // =========================================================
+
+    async function logoutAdmin() {
+
+        const { error } =
+            await supabaseClient.auth
+                .signOut();
+
+
+        if (error) {
+
+            console.error(
+                'Erro ao sair:',
+                error
+            );
+
+
+            alert(
+                'Não foi possível sair.'
+            );
+
+
+            return;
+        }
+
+
+        usuarioAdmin = null;
+
+
+        document.body.classList.remove(
+            'admin-mode'
+        );
+
+
+        document
+            .getElementById('loginAdmin')
+            ?.classList
+            .remove('oculto');
+
+
+        document
+            .getElementById('criarSenhaAdmin')
+            ?.classList
+            .add('oculto');
+    }
+
+
+    // =========================================================
+    // BOTÃO DE LOGIN
+    // =========================================================
+
+    function configurarLoginAdmin() {
+
+        const btnLogin =
+            document.getElementById(
+                'btnLoginAdmin'
+            );
+
+
+        btnLogin?.addEventListener(
+            'click',
+            async () => {
+
+                const email =
+                    document
+                        .getElementById(
+                            'adminEmail'
+                        )
+                        ?.value
+                        .trim();
+
+
+                const senha =
+                    document
+                        .getElementById(
+                            'adminSenha'
+                        )
+                        ?.value;
+
+
+                if (
+                    !email
+                    ||
+                    !senha
+                ) {
+
+                    alert(
+                        'Preencha o e-mail e a senha.'
+                    );
+
+                    return;
+                }
+
+
+                const entrou =
+                    await loginAdmin(
+                        email,
+                        senha
+                    );
+
+
+                if (!entrou) {
+                    return;
+                }
+
+
+                document
+                    .getElementById(
+                        'loginAdmin'
+                    )
+                    ?.classList
+                    .add('oculto');
+
+
+                document
+                    .getElementById(
+                        'criarSenhaAdmin'
+                    )
+                    ?.classList
+                    .add('oculto');
+            }
+        );
+
+
+        // ENTER NO CAMPO SENHA
+
+        document
+            .getElementById(
+                'adminSenha'
+            )
+            ?.addEventListener(
+                'keydown',
+                event => {
+
+                    if (
+                        event.key
+                        ===
+                        'Enter'
+                    ) {
+
+                        btnLogin?.click();
+                    }
+                }
+            );
+
+
+        // Caso você crie o botão de logout depois
+
+        document
+            .getElementById(
+                'btnLogoutAdmin'
+            )
+            ?.addEventListener(
+                'click',
+                logoutAdmin
+            );
+    }
+
+
+    // =========================================================
+    // CRIAR SENHA DEPOIS DO CONVITE
+    // =========================================================
+
+    function configurarCriacaoSenha() {
+
+        const botao =
+            document.getElementById(
+                'btnCriarSenhaAdmin'
+            );
+
+
+        botao?.addEventListener(
+            'click',
+            async () => {
+
+                const novaSenha =
+                    document
+                        .getElementById(
+                            'novaSenhaAdmin'
+                        )
+                        ?.value;
+
+
+                const confirmar =
+                    document
+                        .getElementById(
+                            'confirmarSenhaAdmin'
+                        )
+                        ?.value;
+
+
+                // =============================================
+                // VALIDAÇÕES
+                // =============================================
+
+                if (!novaSenha) {
+
+                    alert(
+                        'Digite uma senha.'
+                    );
+
+                    return;
+                }
+
+
+                if (
+                    novaSenha.length < 8
+                ) {
+
+                    alert(
+                        'A senha deve ter pelo menos 8 caracteres.'
+                    );
+
+                    return;
+                }
+
+
+                if (
+                    novaSenha !==
+                    confirmar
+                ) {
+
+                    alert(
+                        'As senhas não são iguais.'
+                    );
+
+                    return;
+                }
+
+
+                // =============================================
+                // SALVA A SENHA
+                // =============================================
+
+                const {
+                    data,
+                    error
+                } =
+                    await supabaseClient.auth
+                        .updateUser({
+                            password:
+                                novaSenha
+                        });
+
+
+                if (error) {
+
+                    console.error(
+                        'Erro ao definir senha:',
+                        error
+                    );
+
+
+                    alert(
+                        'Não foi possível definir a senha.'
+                    );
+
+
+                    return;
+                }
+
+
+                usuarioAdmin =
+                    data.user;
+
+
+                alert(
+                    'Senha criada com sucesso!'
+                );
+
+
+                // =============================================
+                // ESCONDE CRIAÇÃO DE SENHA
+                // =============================================
+
+                document
+                    .getElementById(
+                        'criarSenhaAdmin'
+                    )
+                    ?.classList
+                    .add('oculto');
+
+
+                // =============================================
+                // LIBERA ADMIN
+                // =============================================
+
+                document.body.classList.add(
+                    'admin-mode'
+                );
+
+
+                // =============================================
+                // LIMPA OS PARÂMETROS DO CONVITE DA URL
+                // =============================================
+
+                history.replaceState(
+                    {},
+                    document.title,
+                    window.location.pathname
+                );
+            }
+        );
+    }
+
+
+    // =========================================================
+    // LINHAS
+    // =========================================================
+
+    const labels = [
+
+        'Linha 1',
+        'Linha 2',
+        'Linha 3',
+        'Linha 4',
+        'Linha 5',
+        'Linha 6',
+        'Linha 7',
+        'Linha 8',
+        'Linha 9',
+        'Linha 10',
+        'Linha 14'
+
+    ];
+
+
+    // =========================================================
+    // DADOS DO SUPABASE
+    // =========================================================
+
+    let atuais = {
+
+        amarela: [],
+        vermelha: [],
+        nd: []
+
+    };
+
+
+    let vencidas = {
+
+        amarela: [],
+        vermelha: [],
+        nd: []
+
+    };
+
+
+    let diasPorCategoria = {
+
+        amarela: [],
+        vermelha: [],
+        nd: []
+
+    };
+
+
+    let programado = [];
+
+    let materialAndamento = [];
+
+    let preventiva = [];
+
+    let dadosPainel = [];
+
+
+    // =========================================================
+    // ELEMENTOS
+    // =========================================================
+
+    const panel =
+        document.getElementById(
+            'vencimentoPanel'
+        );
+
+
+    const linhaSelecionada =
+        document.getElementById(
+            'linhaSelecionada'
+        );
+
+
+    let indiceSelecionado = -1;
+
+    let timerAtualizacao;
+
+    let chart;
+
+
+    // =========================================================
+    // CARREGAR DADOS
+    // =========================================================
+
+    async function carregarDadosSupabase() {
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .from('painel_notas')
+                .select(`
+                    id,
+                    linha,
+                    amarela,
+                    vermelha,
+                    nd,
+                    programado,
+                    material_andamento,
+                    preventiva,
+                    amarela_vencida,
+                    vermelha_vencida,
+                    nd_vencida,
+                    dias_amarela,
+                    dias_vermelha,
+                    dias_nd
+                `);
+
+
+        if (error) {
+
+            console.error(
+                'Erro ao carregar dados:',
+                error
+            );
+
+
+            alert(
+                'Não foi possível carregar os dados do painel.'
+            );
+
+
+            return false;
+        }
+
+
+        // =============================================
+        // ORGANIZAR PELA ORDEM DAS LINHAS
+        // =============================================
+
+        dadosPainel =
+            labels.map(
+                linha => {
+
+                    const registro =
+                        data.find(
+                            item =>
+                                item.linha
+                                ===
+                                linha
+                        );
+
+
+                    if (!registro) {
+
+                        console.warn(
+                            `Linha não encontrada: ${linha}`
+                        );
+                    }
+
+
+                    return registro;
+                }
+            );
+
+
+        // =====================================================
+        // ATUAIS
+        // =====================================================
+
+        atuais.amarela =
+            dadosPainel.map(
+                item =>
+                    item?.amarela
+                    ??
+                    0
+            );
+
+
+        atuais.vermelha =
+            dadosPainel.map(
+                item =>
+                    item?.vermelha
+                    ??
+                    0
+            );
+
+
+        atuais.nd =
+            dadosPainel.map(
+                item =>
+                    item?.nd
+                    ??
+                    0
+            );
+
+
+        // =====================================================
+        // VENCIDAS
+        // =====================================================
+
+        vencidas.amarela =
+            dadosPainel.map(
+                item =>
+                    item?.amarela_vencida
+                    ??
+                    0
+            );
+
+
+        vencidas.vermelha =
+            dadosPainel.map(
+                item =>
+                    item?.vermelha_vencida
+                    ??
+                    0
+            );
+
+
+        vencidas.nd =
+            dadosPainel.map(
+                item =>
+                    item?.nd_vencida
+                    ??
+                    0
+            );
+
+
+        // =====================================================
+        // TEMPO VENCIDO
+        // =====================================================
+
+        diasPorCategoria.amarela =
+            dadosPainel.map(
+                item =>
+                    item?.dias_amarela
+                    ??
+                    '—'
+            );
+
+
+        diasPorCategoria.vermelha =
+            dadosPainel.map(
+                item =>
+                    item?.dias_vermelha
+                    ??
+                    '—'
+            );
+
+
+        diasPorCategoria.nd =
+            dadosPainel.map(
+                item =>
+                    item?.dias_nd
+                    ??
+                    '—'
+            );
+
+
+        // =====================================================
+        // STATUS OPERACIONAL
+        // =====================================================
+
+        programado =
+            dadosPainel.map(
+                item =>
+                    item?.programado
+                    ??
+                    0
+            );
+
+
+        materialAndamento =
+            dadosPainel.map(
+                item =>
+                    item?.material_andamento
+                    ??
+                    0
+            );
+
+
+        preventiva =
+            dadosPainel.map(
+                item =>
+                    item?.preventiva
+                    ??
+                    0
+            );
+
+
+        console.log(
+            'Dados carregados:',
+            dadosPainel
+        );
+
+
+        return true;
+    }
+
+
+    // =========================================================
+    // ATUALIZA CARDS E TABELA
+    // =========================================================
+
+    function atualizarResumoETabela() {
+
+        const totalAmarela =
+            atuais.amarela.reduce(
+                (soma, valor) =>
+                    soma
+                    +
+                    Number(valor || 0),
+                0
+            );
+
+
+        const totalVermelha =
+            atuais.vermelha.reduce(
+                (soma, valor) =>
+                    soma
+                    +
+                    Number(valor || 0),
+                0
+            );
+
+
+        const totalNd =
+            atuais.nd.reduce(
+                (soma, valor) =>
+                    soma
+                    +
+                    Number(valor || 0),
+                0
+            );
+
+
+        const totalGeral =
+            totalAmarela
+            +
+            totalVermelha
+            +
+            totalNd;
+
+
+        // =====================================================
+        // CARDS SUPERIORES
+        // =====================================================
+
+        const elAmarela =
+            document.getElementById(
+                'totalAmarela'
+            );
+
+
+        const elVermelha =
+            document.getElementById(
+                'totalVermelha'
+            );
+
+
+        const elNd =
+            document.getElementById(
+                'totalNd'
+            );
+
+
+        const elGeral =
+            document.getElementById(
+                'totalGeral'
+            );
+
+
+        if (elAmarela) {
+
+            elAmarela.textContent =
+                totalAmarela;
+        }
+
+
+        if (elVermelha) {
+
+            elVermelha.textContent =
+                totalVermelha;
+        }
+
+
+        if (elNd) {
+
+            elNd.textContent =
+                totalNd;
+        }
+
+
+        if (elGeral) {
+
+            elGeral.textContent =
+                totalGeral;
+        }
+
+
+        // =====================================================
+        // TABELA
+        // =====================================================
+
+        document
+            .querySelectorAll(
+                '#detalhamentoBody td[data-linha][data-field]'
+            )
+            .forEach(
+                celula => {
+
+                    const linha =
+                        celula.dataset.linha;
+
+
+                    const campo =
+                        celula.dataset.field;
+
+
+                    const registro =
+                        dadosPainel.find(
+                            item =>
+                                item?.linha
+                                ===
+                                linha
+                        );
+
+
+                    celula.textContent =
+                        registro?.[campo]
+                        ??
+                        0;
+                }
+            );
+    }
+
+
+    // =========================================================
+    // PLUGIN DE DESTAQUE DA LINHA
+    // =========================================================
+
+    const destaqueLinhaPlugin = {
+
+        id:
+            'destaqueLinha',
+
+
+        beforeDatasetsDraw(chart) {
+
+            if (
+                indiceSelecionado < 0
+            ) {
+
+                return;
+            }
+
+
+            const {
+                ctx,
+                chartArea,
+                scales
+            } = chart;
+
+
+            const x =
+                scales.x;
+
+
+            const centro =
+                x.getPixelForValue(
+                    indiceSelecionado
+                );
+
+
+            let anterior;
+
+            let proximo;
+
+
+            if (
+                indiceSelecionado > 0
+            ) {
+
+                anterior =
+                    x.getPixelForValue(
+                        indiceSelecionado - 1
+                    );
+
+            } else {
+
+                anterior =
+                    centro
+                    -
+                    (
+                        x.getPixelForValue(1)
+                        -
+                        centro
+                    );
+            }
+
+
+            if (
+                indiceSelecionado
+                <
+                labels.length - 1
+            ) {
+
+                proximo =
+                    x.getPixelForValue(
+                        indiceSelecionado + 1
+                    );
+
+            } else {
+
+                proximo =
+                    centro
+                    +
+                    (
+                        centro
+                        -
+                        x.getPixelForValue(
+                            indiceSelecionado - 1
+                        )
+                    );
+            }
+
+
+            const largura =
+                Math.min(
+                    Math.abs(
+                        proximo
+                        -
+                        centro
+                    ),
+                    Math.abs(
+                        centro
+                        -
+                        anterior
+                    )
+                )
+                *
+                .82;
+
+
+            ctx.save();
+
+
+            ctx.fillStyle =
+                'rgba(52, 152, 219, .09)';
+
+
+            ctx.strokeStyle =
+                'rgba(52, 152, 219, .40)';
+
+
+            ctx.lineWidth =
+                1.5;
+
+
+            ctx.beginPath();
+
+
+            ctx.roundRect(
+                centro - largura / 2,
+                chartArea.top,
+                largura,
+                chartArea.bottom
+                -
+                chartArea.top,
+                8
+            );
+
+
+            ctx.fill();
+
+            ctx.stroke();
+
+            ctx.restore();
+        }
+    };
+
+
+    // =========================================================
+    // ATUALIZAR PAINEL DE VENCIMENTO
+    // =========================================================
+
+    function atualizarVencimento(i) {
+
+        if (
+            i === indiceSelecionado
+        ) {
+
+            return;
+        }
+
+
+        indiceSelecionado =
+            i;
+
+
+        if (chart) {
+
+            chart.draw();
+        }
+
+
+        panel
+            ?.classList
+            .add(
+                'atualizando'
+            );
+
+
+        linhaSelecionada
+            ?.classList
+            .add(
+                'trocando'
+            );
+
+
+        clearTimeout(
+            timerAtualizacao
+        );
+
+
+        timerAtualizacao =
+            setTimeout(
+                () => {
+
+
+                    const a =
+                        vencidas
+                            .amarela[i];
+
+
+                    const v =
+                        vencidas
+                            .vermelha[i];
+
+
+                    const n =
+                        vencidas
+                            .nd[i];
+
+
+                    if (
+                        linhaSelecionada
+                    ) {
+
+                        linhaSelecionada
+                            .textContent =
+                            labels[i];
+                    }
+
+
+                    document
+                        .getElementById(
+                            'totalVencidas'
+                        )
+                        .textContent =
+                        a + v + n;
+
+
+                    document
+                        .getElementById(
+                            'amarelaVencida'
+                        )
+                        .textContent =
+                        a;
+
+
+                    document
+                        .getElementById(
+                            'vermelhaVencida'
+                        )
+                        .textContent =
+                        v;
+
+
+                    document
+                        .getElementById(
+                            'ndVencida'
+                        )
+                        .textContent =
+                        n;
+
+
+                    // =================================================
+                    // STATUS
+                    // =================================================
+
+                    const cardProgramado =
+                        document.getElementById(
+                            'cardProgramado'
+                        );
+
+
+                    const cardMaterialAndamento =
+                        document.getElementById(
+                            'cardMaterialAndamento'
+                        );
+
+
+                    const programadoLabel =
+                        document.getElementById(
+                            'programadoLabel'
+                        );
+
+
+                    const programadoValor =
+                        document.getElementById(
+                            'programado'
+                        );
+
+
+                    const editarProgramado =
+                        document.getElementById(
+                            'editarProgramado'
+                        );
+
+
+                    // =================================================
+                    // LINHA 1 = PREVENTIVA
+                    // =================================================
+
+                    if (i === 0) {
+
+                        programadoLabel.textContent =
+                            'Preventiva';
+
+
+                        programadoValor.textContent =
+                            preventiva[i]
+                            ??
+                            0;
+
+
+                        if (
+                            cardMaterialAndamento
+                        ) {
+
+                            cardMaterialAndamento
+                                .style
+                                .display =
+                                'none';
+                        }
+
+
+                        if (
+                            cardProgramado
+                        ) {
+
+                            cardProgramado
+                                .style
+                                .gridColumn =
+                                '1 / -1';
+                        }
+
+
+                        if (
+                            editarProgramado
+                        ) {
+
+                            editarProgramado
+                                .dataset
+                                .field =
+                                'preventiva';
+
+
+                            editarProgramado
+                                .dataset
+                                .label =
+                                'Preventiva';
+                        }
+
+                    } else {
+
+                        // =================================================
+                        // OUTRAS LINHAS
+                        // =================================================
+
+                        programadoLabel.textContent =
+                            'Programado';
+
+
+                        programadoValor.textContent =
+                            programado[i]
+                            ??
+                            0;
+
+
+                        if (
+                            cardMaterialAndamento
+                        ) {
+
+                            cardMaterialAndamento
+                                .style
+                                .display =
+                                'flex';
+                        }
+
+
+                        if (
+                            cardProgramado
+                        ) {
+
+                            cardProgramado
+                                .style
+                                .gridColumn =
+                                'auto';
+                        }
+
+
+                        document
+                            .getElementById(
+                                'materialAndamento'
+                            )
+                            .textContent =
+                            materialAndamento[i]
+                            ??
+                            0;
+
+
+                        if (
+                            editarProgramado
+                        ) {
+
+                            editarProgramado
+                                .dataset
+                                .field =
+                                'programado';
+
+
+                            editarProgramado
+                                .dataset
+                                .label =
+                                'Programado';
+                        }
+                    }
+
+
+                    // =================================================
+                    // DIAS
+                    // =================================================
+
+                    document
+                        .getElementById(
+                            'diasAmarela'
+                        )
+                        .textContent =
+                        a > 0
+
+                            ? diasPorCategoria
+                                .amarela[i]
+
+                            : 'Sem vencidas';
+
+
+                    document
+                        .getElementById(
+                            'diasVermelha'
+                        )
+                        .textContent =
+                        v > 0
+
+                            ? diasPorCategoria
+                                .vermelha[i]
+
+                            : 'Sem vencidas';
+
+
+                    document
+                        .getElementById(
+                            'diasNd'
+                        )
+                        .textContent =
+                        n > 0
+
+                            ? diasPorCategoria
+                                .nd[i]
+
+                            : 'Sem vencidas';
+
+
+                    // =================================================
+                    // SEM VENCIDAS
+                    // =================================================
+
+                    document
+                        .getElementById(
+                            'cardAmarela'
+                        )
+                        ?.classList
+                        .toggle(
+                            'sem-vencidas',
+                            a === 0
+                        );
+
+
+                    document
+                        .getElementById(
+                            'cardVermelha'
+                        )
+                        ?.classList
+                        .toggle(
+                            'sem-vencidas',
+                            v === 0
+                        );
+
+
+                    document
+                        .getElementById(
+                            'cardNd'
+                        )
+                        ?.classList
+                        .toggle(
+                            'sem-vencidas',
+                            n === 0
+                        );
+
+
+                    // =================================================
+                    // ANIMAÇÃO
+                    // =================================================
+
+                    panel
+                        ?.classList
+                        .add(
+                            'aberto'
+                        );
+
+
+                    panel
+                        ?.classList
+                        .remove(
+                            'atualizando'
+                        );
+
+
+                    panel
+                        ?.classList
+                        .remove(
+                            'pulso'
+                        );
+
+
+                    if (panel) {
+
+                        void panel.offsetWidth;
+                    }
+
+
+                    panel
+                        ?.classList
+                        .add(
+                            'pulso'
+                        );
+
+
+                    linhaSelecionada
+                        ?.classList
+                        .remove(
+                            'trocando'
+                        );
+
+                },
+                120
+            );
+    }
+
+
+    // =========================================================
+    // CRIAR GRÁFICO
+    // =========================================================
+
+    function criarGrafico() {
+
+        const canvas =
+            document.getElementById(
+                'notasChart'
+            );
+
+
+        if (!canvas) {
+
+            console.error(
+                'Canvas notasChart não encontrado.'
+            );
+
+
+            return;
+        }
+
+
+        chart =
+            new Chart(
+                canvas.getContext('2d'),
+                {
+
+                    type:
+                        'bar',
+
+
+                    data: {
+
+                        labels:
+
+
+                            labels,
+
+
+                        datasets: [
+
+                            {
+                                label:
+                                    'Amarela',
+
+                                data:
+                                    atuais.amarela,
+
+                                backgroundColor:
+                                    '#f1c40f'
+                            },
+
+                            {
+                                label:
+                                    'Vermelha',
+
+                                data:
+                                    atuais.vermelha,
+
+                                backgroundColor:
+                                    '#e74c3c'
+                            },
+
+                            {
+                                label:
+                                    'ND',
+
+                                data:
+                                    atuais.nd,
+
+                                backgroundColor:
+                                    '#7f8c8d'
+                            }
+
+                        ]
+                    },
+
+
+                    plugins: [
+
+                        destaqueLinhaPlugin
+
+                    ],
+
+
+                    options: {
+
+                        responsive:
+                            true,
+
+
+                        maintainAspectRatio:
+                            false,
+
+
+                        interaction: {
+
+                            mode:
+                                'index',
+
+                            intersect:
+                                false
+
+                        },
+
+
+                        plugins: {
+
+                            legend: {
+
+                                position:
+                                    'top'
+
+                            }
+
+                        },
+
+
+                        scales: {
+
+                            x: {
+
+                                stacked:
+                                    true
+
+                            },
+
+
+                            y: {
+
+                                stacked:
+                                    true,
+
+
+                                beginAtZero:
+                                    true,
+
+
+                                title: {
+
+                                    display:
+                                        true,
+
+
+                                    text:
+                                        'Quantidade de notas'
+
+                                },
+
+
+                                ticks: {
+
+                                    stepSize:
+                                        10
+
+                                }
+
+                            }
+
+                        },
+
+
+                        onHover(
+                            event,
+                            elements
+                        ) {
+
+                            if (
+                                !elements.length
+                            ) {
+
+                                return;
+                            }
+
+
+                            atualizarVencimento(
+                                elements[0]
+                                    .index
+                            );
+                        }
+                    }
+                }
+            );
+    }
+
+
+    // =========================================================
+    // ATUALIZA GRÁFICO
+    // =========================================================
+
+    function atualizarGrafico() {
+
+        if (!chart) {
+
+            return;
+        }
+
+
+        chart
+            .data
+            .datasets[0]
+            .data =
+            atuais.amarela;
+
+
+        chart
+            .data
+            .datasets[1]
+            .data =
+            atuais.vermelha;
+
+
+        chart
+            .data
+            .datasets[2]
+            .data =
+            atuais.nd;
+
+
+        chart.update();
+    }
+
+
+    // =========================================================
+    // UPDATE SUPABASE
+    // =========================================================
+
+    async function atualizarCampoSupabase(
+        linha,
+        campo,
+        valor
+    ) {
+
+        if (!usuarioAdmin) {
+
+            alert(
+                'Você precisa estar autenticado.'
+            );
+
+
+            return false;
+        }
+
+
+        const {
+            error
+        } =
+            await supabaseClient
+                .from(
+                    'painel_notas'
+                )
+                .update({
+
+                    [campo]:
+                        valor
+
+                })
+                .eq(
+                    'linha',
+                    linha
+                );
+
+
+        if (error) {
+
+            console.error(
+                'Erro ao atualizar:',
+                error
+            );
+
+
+            alert(
+                'Não foi possível salvar a alteração.'
+            );
+
+
+            return false;
+        }
+
+
+        await recarregarPainel();
+
+
+        return true;
+    }
+
+
+    // =========================================================
+    // PREPARAR VALORES
+    // =========================================================
+
+    function prepararValor(
+        campo,
+        valorDigitado
+    ) {
+
+        const camposNumericos = [
+
+            'amarela',
+            'vermelha',
+            'nd',
+
+            'amarela_vencida',
+            'vermelha_vencida',
+            'nd_vencida',
+
+            'programado',
+            'material_andamento',
+            'preventiva'
+
+        ];
+
+
+        const camposTexto = [
+
+            'dias_amarela',
+            'dias_vermelha',
+            'dias_nd'
+
+        ];
+
+
+        // =====================================================
+        // NÚMEROS
+        // =====================================================
+
+        if (
+            camposNumericos.includes(
+                campo
+            )
+        ) {
+
+            const numero =
+                Number(
+                    valorDigitado
+                );
+
+
+            if (
+                !Number.isInteger(
+                    numero
+                )
+                ||
+                numero < 0
+            ) {
+
+                return {
+
+                    valido:
+                        false
+
+                };
+            }
+
+
+            return {
+
+                valido:
+                    true,
+
+                valor:
+                    numero
+
+            };
+        }
+
+
+        // =====================================================
+        // TEXTO
+        // =====================================================
+
+        if (
+            camposTexto.includes(
+                campo
+            )
+        ) {
+
+            const texto =
+                valorDigitado.trim();
+
+
+            return {
+
+                valido:
+                    true,
+
+                valor:
+                    texto === ''
+                        ? null
+                        : texto
+
+            };
+        }
+
+
+        return {
+
+            valido:
+                false
+
+        };
+    }
+
+
+    // =========================================================
+    // EDIÇÃO DOS CARDS
+    // =========================================================
+
+    function configurarEdicaoCards() {
+
+        document
+            .querySelectorAll(
+                '.edit-btn[data-field]'
+            )
+            .forEach(
+                botao => {
+
+                    botao
+                        .addEventListener(
+                            'click',
+                            async event => {
+
+                                event.stopPropagation();
+
+
+                                if (
+                                    !usuarioAdmin
+                                ) {
+
+                                    alert(
+                                        'Faça login como administrador.'
+                                    );
+
+                                    return;
+                                }
+
+
+                                if (
+                                    indiceSelecionado < 0
+                                ) {
+
+                                    alert(
+                                        'Selecione uma linha no gráfico primeiro.'
+                                    );
+
+                                    return;
+                                }
+
+
+                                const campo =
+                                    botao.dataset.field;
+
+
+                                const label =
+                                    botao.dataset.label
+                                    ||
+                                    campo;
+
+
+                                const linha =
+                                    labels[
+                                        indiceSelecionado
+                                    ];
+
+
+                                const registro =
+                                    dadosPainel[
+                                        indiceSelecionado
+                                    ];
+
+
+                                if (!registro) {
+
+                                    return;
+                                }
+
+
+                                const valorAtual =
+                                    registro[
+                                        campo
+                                    ];
+
+
+                                const novoValor =
+                                    prompt(
+                                        `${label} - ${linha}`,
+                                        valorAtual
+                                        ??
+                                        ''
+                                    );
+
+
+                                if (
+                                    novoValor
+                                    ===
+                                    null
+                                ) {
+
+                                    return;
+                                }
+
+
+                                const resultado =
+                                    prepararValor(
+                                        campo,
+                                        novoValor
+                                    );
+
+
+                                if (
+                                    !resultado.valido
+                                ) {
+
+                                    alert(
+                                        'Digite um valor válido.'
+                                    );
+
+
+                                    return;
+                                }
+
+
+                                await atualizarCampoSupabase(
+                                    linha,
+                                    campo,
+                                    resultado.valor
+                                );
+                            }
+                        );
+                }
+            );
+    }
+
+
+    // =========================================================
+    // EDIÇÃO DA TABELA
+    // =========================================================
+
+    function configurarEdicaoTabela() {
+
+        document
+            .querySelectorAll(
+                '#detalhamentoBody td[data-linha][data-field]'
+            )
+            .forEach(
+                celula => {
+
+                    celula
+                        .addEventListener(
+                            'click',
+                            async () => {
+
+                                if (
+                                    !usuarioAdmin
+                                ) {
+
+                                    return;
+                                }
+
+
+                                const linha =
+                                    celula.dataset.linha;
+
+
+                                const campo =
+                                    celula.dataset.field;
+
+
+                                const registro =
+                                    dadosPainel.find(
+                                        item =>
+                                            item?.linha
+                                            ===
+                                            linha
+                                    );
+
+
+                                if (!registro) {
+
+                                    return;
+                                }
+
+
+                                const valorAtual =
+                                    registro[campo]
+                                    ??
+                                    0;
+
+
+                                const novoValor =
+                                    prompt(
+                                        `${campo} - ${linha}`,
+                                        valorAtual
+                                    );
+
+
+                                if (
+                                    novoValor
+                                    ===
+                                    null
+                                ) {
+
+                                    return;
+                                }
+
+
+                                const resultado =
+                                    prepararValor(
+                                        campo,
+                                        novoValor
+                                    );
+
+
+                                if (
+                                    !resultado.valido
+                                ) {
+
+                                    alert(
+                                        'Digite um número inteiro válido.'
+                                    );
+
+
+                                    return;
+                                }
+
+
+                                await atualizarCampoSupabase(
+                                    linha,
+                                    campo,
+                                    resultado.valor
+                                );
+                            }
+                        );
+                }
+            );
+    }
+
+
+    // =========================================================
+    // RECARREGAR TUDO
+    // =========================================================
+
+    async function recarregarPainel() {
+
+        const carregou =
+            await carregarDadosSupabase();
+
+
+        if (!carregou) {
+
+            return;
+        }
+
+
+        atualizarResumoETabela();
+
+
+        atualizarGrafico();
+
+
+        // =====================================================
+        // ATUALIZA A LINHA QUE ESTAVA SELECIONADA
+        // =====================================================
+
+        if (
+            indiceSelecionado >= 0
+        ) {
+
+            const indiceAnterior =
+                indiceSelecionado;
+
+
+            indiceSelecionado =
+                -1;
+
+
+            atualizarVencimento(
+                indiceAnterior
+            );
+        }
+    }
+
+
+    // =========================================================
+    // INICIAR APLICAÇÃO
+    // =========================================================
+
+    async function iniciarAplicacao() {
+
+        // =============================================
+        // CONFIGURA LOGIN
+        // =============================================
+
+        configurarLoginAdmin();
+
+
+        configurarCriacaoSenha();
+
+
+        // =============================================
+        // CARREGAR PAINEL
+        // =============================================
+
+        const carregou =
+            await carregarDadosSupabase();
+
+
+        if (!carregou) {
+
+            return;
+        }
+
+
+        atualizarResumoETabela();
+
+
+        criarGrafico();
+
+
+        configurarEdicaoCards();
+
+
+        configurarEdicaoTabela();
+
+
+        // =============================================
+        // VERIFICAR ADMIN
+        // =============================================
+
+        await iniciarAdmin();
+    }
+
+
+    // =========================================================
+    // EXECUTAR
+    // =========================================================
+
+    iniciarAplicacao();
+    
+    </script>
+</body>
+
+</html>
