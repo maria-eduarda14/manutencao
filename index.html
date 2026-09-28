@@ -514,101 +514,634 @@
                 padding-top: 18px;
             }
         }
+
+        /* =========================================================
+           MODO ADMIN
+        ========================================================= */
+        
+        .admin-only {
+            display: none;
+        }
+        
+        /*
+        Quando o JavaScript detectar que há um administrador
+        autenticado, ele adicionará:
+        
+        <body class="admin-mode">
+        
+        e os controles aparecem.
+        */
+        
+        body.admin-mode .admin-only {
+            display: flex;
+        }
+        
+        
+        /* Badge de administrador */
+        
+        .header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        
+        .admin-badge {
+            align-items: center;
+            justify-content: center;
+        
+            padding: 7px 12px;
+        
+            border-radius: 999px;
+        
+            font-size: 12px;
+            font-weight: 700;
+        
+            color: #1769aa;
+        
+            background: #eaf4fc;
+        
+            border: 1px solid #cbe5f8;
+        }
+        
+        
+        /* Pequena indicação administrativa */
+        
+        .admin-hint {
+            align-items: center;
+        
+            font-size: 12px;
+            font-weight: 600;
+        
+            color: #777;
+        }
+        
+        
+        /* =========================================================
+           BOTÃO DE EDIÇÃO
+        ========================================================= */
+        
+        .vencimento-item {
+            position: relative;
+        }
+        
+        .edit-btn {
+            position: absolute;
+        
+            top: 10px;
+            right: 10px;
+        
+            width: 31px;
+            height: 31px;
+        
+            align-items: center;
+            justify-content: center;
+        
+            padding: 0;
+        
+            border: 1px solid #dce2e7;
+            border-radius: 8px;
+        
+            background: #fff;
+        
+            color: #66727d;
+        
+            font-size: 18px;
+            line-height: 1;
+        
+            cursor: pointer;
+        
+            box-shadow: 0 2px 5px rgba(0, 0, 0, .06);
+        
+            transition:
+                background .18s ease,
+                color .18s ease,
+                border-color .18s ease,
+                transform .18s ease,
+                box-shadow .18s ease;
+        }
+        
+        
+        .edit-btn:hover {
+            color: #2980b9;
+        
+            background: #f5faff;
+        
+            border-color: #bcdcf3;
+        
+            box-shadow: 0 3px 8px rgba(0, 0, 0, .10);
+        
+            transform: translateY(-1px);
+        }
+        
+        
+        .edit-btn:active {
+            transform: translateY(0);
+        }
+        
+        
+        /* Botão menor perto do "Tempo vencido" */
+        
+        .dias-container {
+            position: relative;
+        }
+        
+        .edit-btn-small {
+            top: 7px;
+            right: 0;
+        
+            width: 27px;
+            height: 27px;
+        
+            font-size: 15px;
+        }
+        
+        
+        /*
+        Reserva espaço para o lápis para ele não ficar
+        em cima do título do cartão.
+        */
+        
+        body.admin-mode .vencimento-item > .label {
+            padding-right: 38px;
+        }
+        
+        
+        /* =========================================================
+           ADMIN NA TABELA
+        ========================================================= */
+        
+        .table-header {
+            display: flex;
+        
+            align-items: center;
+            justify-content: space-between;
+        
+            gap: 15px;
+        
+            margin-bottom: 18px;
+        }
+        
+        .table-header h2 {
+            margin-bottom: 0;
+        }
+        
+        
+        /*
+        No modo administrativo deixa claro que as células
+        podem ser manipuladas.
+        */
+        
+        body.admin-mode #detalhamentoBody td[data-field] {
+            position: relative;
+        
+            cursor: pointer;
+        
+            transition:
+                background .15s ease,
+                box-shadow .15s ease;
+        }
+        
+        body.admin-mode #detalhamentoBody td[data-field]:hover {
+            background: #eef7fd;
+        
+            box-shadow:
+                inset 0 0 0 1px #c6e3f7;
+        }
+        
+        
+        /* Lápis que poderá ser criado pelo JavaScript
+           dentro das células */
+        
+        .table-edit-btn {
+            margin-left: 7px;
+        
+            border: none;
+        
+            background: transparent;
+        
+            color: #7b8791;
+        
+            font-size: 13px;
+        
+            cursor: pointer;
+        }
+        
+        .table-edit-btn:hover {
+            color: #2980b9;
+        }
+        
+        
+        /* =========================================================
+           RESPONSIVO
+        ========================================================= */
+        
+        @media(max-width: 600px) {
+        
+            .header-row {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 8px;
+            }
+        
+            .admin-badge {
+                align-self: flex-start;
+            }
+        
+            .table-header {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 5px;
+            }
+        
+            .edit-btn {
+                width: 29px;
+                height: 29px;
+        
+                top: 8px;
+                right: 8px;
+        
+                font-size: 16px;
+            }
+        
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
+        <!-- =========================================
+             CABEÇALHO
+        ========================================== -->
         <header>
             <div class="logo-box">
                 <img class="logo" src="logo.png" alt="Logo">
             </div>
-
-            <div class="header-text">
-                <h1>Notas de Manutenção de Embalagem</h1>
+    
+            <div class="header-row">
+                <div class="header-text">
+                    <h1>Notas de Manutenção de Embalagem</h1>
+                </div>
+    
+                <!-- Só aparece no modo admin -->
+                <div id="adminBadge" class="admin-badge admin-only">
+                    Modo administrador
+                </div>
             </div>
         </header>
+    
+    
+        <!-- =========================================
+             TOTAIS GERAIS
+             Estes valores serão calculados pelo JS.
+        ========================================== -->
         <section class="cards">
+    
             <div class="card yellow">
                 <div class="card-title">Notas Amarelas</div>
-                <div class="card-value">14</div>
+                <div id="totalAmarela" class="card-value">0</div>
             </div>
+    
             <div class="card red">
                 <div class="card-title">Notas Vermelhas</div>
-                <div class="card-value">160</div>
+                <div id="totalVermelha" class="card-value">0</div>
             </div>
+    
             <div class="card gray">
                 <div class="card-title">ND</div>
-                <div class="card-value">155</div>
+                <div id="totalNd" class="card-value">0</div>
             </div>
+    
             <div class="card total">
                 <div class="card-title">Total Geral</div>
-                <div class="card-value">329</div>
+                <div id="totalGeral" class="card-value">0</div>
             </div>
+    
         </section>
+    
+    
+        <!-- =========================================
+             GRÁFICO
+        ========================================== -->
         <section class="chart-container">
+    
             <div class="chart-header">
-                <h2>Distribuição das notas por linha</h2>
+    
+                <div>
+                    <h2>Distribuição das notas por linha</h2>
+                </div>
+    
+                <div class="admin-hint admin-only">
+                    Selecione uma linha para editar seus dados
+                </div>
+    
             </div>
-            <div class="chart-wrapper"><canvas id="notasChart"></canvas></div>
+    
+            <div class="chart-wrapper">
+                <canvas id="notasChart"></canvas>
+            </div>
+    
         </section>
+    
+    
+        <!-- =========================================
+             PAINEL DE VENCIMENTO
+        ========================================== -->
         <section id="vencimentoPanel" class="vencimento-panel">
+    
             <div class="vencimento-header">
-                <h3>Informações de vencimento</h3><span id="linhaSelecionada" class="linha-selecionada">—</span>
+    
+                <h3>Informações de vencimento</h3>
+    
+                <span
+                    id="linhaSelecionada"
+                    class="linha-selecionada">
+                    —
+                </span>
+    
             </div>
+    
+    
             <div class="vencimento-grid">
+    
+                <!-- TOTAL VENCIDAS -->
                 <div class="vencimento-item total-vencidas">
-                    <span class="label">Total vencidas</span>
-                    <span id="totalVencidas" class="value">0</span>
+    
+                    <span class="label">
+                        Total vencidas
+                    </span>
+    
+                    <span
+                        id="totalVencidas"
+                        class="value">
+                        0
+                    </span>
+    
+                    <!-- Não tem lápis:
+                         total é calculado automaticamente -->
+    
                 </div>
-
-                <div id="cardAmarela" class="vencimento-item amarela-vencida">
-                    <span class="label">Amarelas vencidas</span>
-                    <span id="amarelaVencida" class="value">0</span>
-                    <span class="dias-label">Tempo vencido</span>
-                    <span id="diasAmarela" class="dias-value">—</span>
+    
+    
+                <!-- AMARELAS -->
+                <div
+                    id="cardAmarela"
+                    class="vencimento-item amarela-vencida">
+    
+                    <button
+                        type="button"
+                        class="edit-btn admin-only"
+                        data-field="amarela_vencida"
+                        data-label="Amarelas vencidas"
+                        aria-label="Editar amarelas vencidas">
+                        ✎
+                    </button>
+    
+                    <span class="label">
+                        Amarelas vencidas
+                    </span>
+    
+                    <span
+                        id="amarelaVencida"
+                        class="value">
+                        0
+                    </span>
+    
+    
+                    <div class="dias-container">
+    
+                        <span class="dias-label">
+                            Tempo vencido
+                        </span>
+    
+                        <span
+                            id="diasAmarela"
+                            class="dias-value">
+                            —
+                        </span>
+    
+                        <button
+                            type="button"
+                            class="edit-btn edit-btn-small admin-only"
+                            data-field="dias_amarela"
+                            data-label="Tempo vencido - Amarela"
+                            aria-label="Editar tempo vencido das amarelas">
+                            ✎
+                        </button>
+    
+                    </div>
+    
                 </div>
-
-                <div id="cardVermelha" class="vencimento-item vermelha-vencida">
-                    <span class="label">Vermelhas vencidas</span>
-                    <span id="vermelhaVencida" class="value">0</span>
-                    <span class="dias-label">Tempo vencido</span>
-                    <span id="diasVermelha" class="dias-value">—</span>
+    
+    
+                <!-- VERMELHAS -->
+                <div
+                    id="cardVermelha"
+                    class="vencimento-item vermelha-vencida">
+    
+                    <button
+                        type="button"
+                        class="edit-btn admin-only"
+                        data-field="vermelha_vencida"
+                        data-label="Vermelhas vencidas"
+                        aria-label="Editar vermelhas vencidas">
+                        ✎
+                    </button>
+    
+                    <span class="label">
+                        Vermelhas vencidas
+                    </span>
+    
+                    <span
+                        id="vermelhaVencida"
+                        class="value">
+                        0
+                    </span>
+    
+    
+                    <div class="dias-container">
+    
+                        <span class="dias-label">
+                            Tempo vencido
+                        </span>
+    
+                        <span
+                            id="diasVermelha"
+                            class="dias-value">
+                            —
+                        </span>
+    
+                        <button
+                            type="button"
+                            class="edit-btn edit-btn-small admin-only"
+                            data-field="dias_vermelha"
+                            data-label="Tempo vencido - Vermelha"
+                            aria-label="Editar tempo vencido das vermelhas">
+                            ✎
+                        </button>
+    
+                    </div>
+    
                 </div>
-
-                <div id="cardNd" class="vencimento-item nd-vencida">
-                    <span class="label">ND vencidas</span>
-                    <span id="ndVencida" class="value">0</span>
-                    <span class="dias-label">Tempo vencido</span>
-                    <span id="diasNd" class="dias-value">—</span>
+    
+    
+                <!-- ND -->
+                <div
+                    id="cardNd"
+                    class="vencimento-item nd-vencida">
+    
+                    <button
+                        type="button"
+                        class="edit-btn admin-only"
+                        data-field="nd_vencida"
+                        data-label="ND vencidas"
+                        aria-label="Editar ND vencidas">
+                        ✎
+                    </button>
+    
+                    <span class="label">
+                        ND vencidas
+                    </span>
+    
+                    <span
+                        id="ndVencida"
+                        class="value">
+                        0
+                    </span>
+    
+    
+                    <div class="dias-container">
+    
+                        <span class="dias-label">
+                            Tempo vencido
+                        </span>
+    
+                        <span
+                            id="diasNd"
+                            class="dias-value">
+                            —
+                        </span>
+    
+                        <button
+                            type="button"
+                            class="edit-btn edit-btn-small admin-only"
+                            data-field="dias_nd"
+                            data-label="Tempo vencido - ND"
+                            aria-label="Editar tempo vencido das ND">
+                            ✎
+                        </button>
+    
+                    </div>
+    
                 </div>
-
+    
             </div>
-
+    
+    
+            <!-- =====================================
+                 STATUS OPERACIONAL
+            ====================================== -->
             <div class="status-section">
-                <div class="status-section-title">Status operacional</div>
-                <div class="status-grid">
-                    <div id="cardProgramado" class="vencimento-item programado-item">
-                        <span id="programadoLabel" class="label">Programado</span>
-                        <span id="programado" class="value">0</span>
-                    </div>
-
-                    <div id="cardMaterialAndamento" class="vencimento-item andamento-item">
-                        <span class="label">Material em Andamento</span>
-                        <span id="materialAndamento" class="value">0</span>
-                    </div>
+    
+                <div class="status-section-title">
+                    Status operacional
                 </div>
+    
+                <div class="status-grid">
+    
+    
+                    <!-- PROGRAMADO / PREVENTIVA -->
+                    <div
+                        id="cardProgramado"
+                        class="vencimento-item programado-item">
+    
+                        <button
+                            id="editarProgramado"
+                            type="button"
+                            class="edit-btn admin-only"
+                            data-field="programado"
+                            data-label="Programado"
+                            aria-label="Editar programado">
+                            ✎
+                        </button>
+    
+                        <span
+                            id="programadoLabel"
+                            class="label">
+                            Programado
+                        </span>
+    
+                        <span
+                            id="programado"
+                            class="value">
+                            0
+                        </span>
+    
+                    </div>
+    
+    
+                    <!-- MATERIAL EM ANDAMENTO -->
+                    <div
+                        id="cardMaterialAndamento"
+                        class="vencimento-item andamento-item">
+    
+                        <button
+                            type="button"
+                            class="edit-btn admin-only"
+                            data-field="material_andamento"
+                            data-label="Material em Andamento"
+                            aria-label="Editar material em andamento">
+                            ✎
+                        </button>
+    
+                        <span class="label">
+                            Material em Andamento
+                        </span>
+    
+                        <span
+                            id="materialAndamento"
+                            class="value">
+                            0
+                        </span>
+    
+                    </div>
+    
+                </div>
+    
             </div>
-
-            <div class="vencimento-hint">O período mostra há quantos dias as notas estão vencidas. Quando houver mais de
-                uma nota, é exibida a faixa do menor ao maior atraso.</div>
+    
+    
+            <div class="vencimento-hint">
+                O período mostra há quantos dias as notas estão vencidas.
+                Quando houver mais de uma nota, é exibida a faixa do menor
+                ao maior atraso.
+            </div>
+    
         </section>
+    
+    
+        <!-- =========================================
+             DETALHAMENTO
+        ========================================== -->
         <section class="table-container">
-            <h2>Detalhamento por linha</h2>
+    
+            <div class="table-header">
+    
+                <h2>Detalhamento por linha</h2>
+    
+                <span class="admin-hint admin-only">
+                    Clique no lápis para alterar um valor
+                </span>
+    
+            </div>
+    
+    
             <table>
+    
                 <thead>
                     <tr>
                         <th>Classificação</th>
+    
                         <th>Linha 1</th>
                         <th>Linha 2</th>
                         <th>Linha 3</th>
@@ -622,238 +1155,1109 @@
                         <th>Linha 14</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td><span class="badge badge-yellow">Amarela</span></td>
-                        <td>0</td>
-                        <td>2</td>
-                        <td>3</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>4</td>
-                        <td>5</td>
-                        <td>0</td>
-                        <td>0</td>
+    
+    
+                <!-- O JavaScript poderá preencher daqui para frente -->
+                <tbody id="detalhamentoBody">
+    
+                    <tr id="rowAmarela">
+    
+                        <td>
+                            <span class="badge badge-yellow">
+                                Amarela
+                            </span>
+                        </td>
+    
+                        <td data-linha="Linha 1" data-field="amarela">0</td>
+                        <td data-linha="Linha 2" data-field="amarela">0</td>
+                        <td data-linha="Linha 3" data-field="amarela">0</td>
+                        <td data-linha="Linha 4" data-field="amarela">0</td>
+                        <td data-linha="Linha 5" data-field="amarela">0</td>
+                        <td data-linha="Linha 6" data-field="amarela">0</td>
+                        <td data-linha="Linha 7" data-field="amarela">0</td>
+                        <td data-linha="Linha 8" data-field="amarela">0</td>
+                        <td data-linha="Linha 9" data-field="amarela">0</td>
+                        <td data-linha="Linha 10" data-field="amarela">0</td>
+                        <td data-linha="Linha 14" data-field="amarela">0</td>
+    
                     </tr>
-                    <tr>
-                        <td><span class="badge badge-red">Vermelha</span></td>
-                        <td>5</td>
-                        <td>0</td>
-                        <td>45</td>
-                        <td>5</td>
-                        <td>1</td>
-                        <td>12</td>
-                        <td>24</td>
-                        <td>32</td>
-                        <td>34</td>
-                        <td>1</td>
-                        <td>1</td>
+    
+    
+                    <tr id="rowVermelha">
+    
+                        <td>
+                            <span class="badge badge-red">
+                                Vermelha
+                            </span>
+                        </td>
+    
+                        <td data-linha="Linha 1" data-field="vermelha">0</td>
+                        <td data-linha="Linha 2" data-field="vermelha">0</td>
+                        <td data-linha="Linha 3" data-field="vermelha">0</td>
+                        <td data-linha="Linha 4" data-field="vermelha">0</td>
+                        <td data-linha="Linha 5" data-field="vermelha">0</td>
+                        <td data-linha="Linha 6" data-field="vermelha">0</td>
+                        <td data-linha="Linha 7" data-field="vermelha">0</td>
+                        <td data-linha="Linha 8" data-field="vermelha">0</td>
+                        <td data-linha="Linha 9" data-field="vermelha">0</td>
+                        <td data-linha="Linha 10" data-field="vermelha">0</td>
+                        <td data-linha="Linha 14" data-field="vermelha">0</td>
+    
                     </tr>
-                    <tr>
-                        <td><span class="badge badge-gray">ND</span></td>
-                        <td>19</td>
-                        <td>10</td>
-                        <td>23</td>
-                        <td>20</td>
-                        <td>6</td>
-                        <td>19</td>
-                        <td>0</td>
-                        <td>41</td>
-                        <td>0</td>
-                        <td>6</td>
-                        <td>11</td>
+    
+    
+                    <tr id="rowNd">
+    
+                        <td>
+                            <span class="badge badge-gray">
+                                ND
+                            </span>
+                        </td>
+    
+                        <td data-linha="Linha 1" data-field="nd">0</td>
+                        <td data-linha="Linha 2" data-field="nd">0</td>
+                        <td data-linha="Linha 3" data-field="nd">0</td>
+                        <td data-linha="Linha 4" data-field="nd">0</td>
+                        <td data-linha="Linha 5" data-field="nd">0</td>
+                        <td data-linha="Linha 6" data-field="nd">0</td>
+                        <td data-linha="Linha 7" data-field="nd">0</td>
+                        <td data-linha="Linha 8" data-field="nd">0</td>
+                        <td data-linha="Linha 9" data-field="nd">0</td>
+                        <td data-linha="Linha 10" data-field="nd">0</td>
+                        <td data-linha="Linha 14" data-field="nd">0</td>
+    
                     </tr>
+    
                 </tbody>
+    
             </table>
+    
         </section>
+    
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        const labels = ['Linha 1', 'Linha 2', 'Linha 3', 'Linha 4', 'Linha 5', 'Linha 6', 'Linha 7', 'Linha 8', 'Linha 9', 'Linha 10', 'Linha 14'];
-        const atuais = { amarela: [0, 2, 3, 0, 0, 0, 0, 4, 5, 0, 0], vermelha: [5, 0, 45, 5, 1, 12, 24, 32, 34, 1, 1], nd: [19, 10, 23, 20, 6, 19, 0, 41, 0, 6, 11] };
-        // Ordem: Linha 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 e 14.
-        const vencidas = {
-            amarela: [0, 2, 1, 0, 0, 0, 0, 1, 1, 0, 0],
-            vermelha: [1, 0, 26, 3, 0, 3, 4, 10, 4, 0, 0],
-            nd: [0, 2, 4, 2, 2, 2, 0, 10, 0, 0, 0]
+        const SUPABASE_URL = 'https://ynrryvkeicgumwlztkxt.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_ONNugoL6AEat-aGqf9aqKg_XwaToWXQ';
+    
+        const supabaseClient = supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_KEY
+        );
+
+        // =========================================================
+        // ADMIN / AUTENTICAÇÃO
+        // =========================================================
+        
+        let usuarioAdmin = null;
+        
+        async function verificarAdmin() {
+        
+            const {
+                data: { session },
+                error
+            } = await supabaseClient.auth.getSession();
+        
+            if (error) {
+                console.error('Erro ao verificar sessão:', error);
+                return;
+            }
+        
+            if (session?.user) {
+                usuarioAdmin = session.user;
+                document.body.classList.add('admin-mode');
+            } else {
+                usuarioAdmin = null;
+                document.body.classList.remove('admin-mode');
+            }
+        }
+        
+        
+        async function loginAdmin(email, senha) {
+        
+            const { data, error } =
+                await supabaseClient.auth.signInWithPassword({
+                    email,
+                    password: senha
+                });
+        
+            if (error) {
+                alert('E-mail ou senha inválidos.');
+                console.error(error);
+                return false;
+            }
+        
+            usuarioAdmin = data.user;
+        
+            document.body.classList.add('admin-mode');
+        
+            return true;
+        }
+        
+        
+        async function logoutAdmin() {
+        
+            const { error } =
+                await supabaseClient.auth.signOut();
+        
+            if (error) {
+                console.error(error);
+                alert('Não foi possível sair.');
+                return;
+            }
+        
+            usuarioAdmin = null;
+        
+            document.body.classList.remove('admin-mode');
+        }
+
+
+        // =========================================================
+        // ORDEM DAS LINHAS
+        // =========================================================
+    
+        const labels = [
+            'Linha 1',
+            'Linha 2',
+            'Linha 3',
+            'Linha 4',
+            'Linha 5',
+            'Linha 6',
+            'Linha 7',
+            'Linha 8',
+            'Linha 9',
+            'Linha 10',
+            'Linha 14'
+        ];
+    
+    
+        // =========================================================
+        // DADOS VINDOS DO SUPABASE
+        // =========================================================
+    
+        let atuais = {
+            amarela: [],
+            vermelha: [],
+            nd: []
         };
-
-        // Faixa de dias vencidos por categoria. Use "—" quando não houver nota vencida.
-        // Para uma única idade, use por exemplo "118 dias". Para várias, use "32 a 68 dias".
-        const diasPorCategoria = {
-            amarela: ['—', '73 a 92 dias', '72 dias', '—', '—', '—', '—', '55 dias', '150 dias', '—', '—'],
-            vermelha: ['89 dias', '—', '4 a 155 dias', '51 a 115 dias', '—', '28 a 117 dias', '120 a 189 dias', '13 a 190 dias', '1 a 110 dias', '—', '—'],
-            nd: ['—', '101 a 209 dias', '97 a 186 dias', '62 a 83 dias', '105 a 130 dias', '157 dias', '—', '30 a 180 dias', '—', '—', '—']
+    
+        let vencidas = {
+            amarela: [],
+            vermelha: [],
+            nd: []
         };
-
-        // Ordem: Linha 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 e 14.
-        const programado = [9, 1, 1, 13, 2, 9, 0, 9, 4, 0, 0];
-        const materialAndamento = [0, 5, 1, 0, 1, 0, 5, 0, 13, 3, 8];
-
-        // Preventiva da Linha 1.
-        const preventiva = [20, null, null, null, null, null, null, null, null, null, null];
-        const panel = document.getElementById('vencimentoPanel');
-        const linhaSelecionada = document.getElementById('linhaSelecionada');
+    
+        let diasPorCategoria = {
+            amarela: [],
+            vermelha: [],
+            nd: []
+        };
+    
+        let programado = [];
+        let materialAndamento = [];
+        let preventiva = [];
+    
+        let dadosPainel = [];
+    
+    
+        // =========================================================
+        // ELEMENTOS DA TELA
+        // =========================================================
+    
+        const panel =
+            document.getElementById('vencimentoPanel');
+    
+        const linhaSelecionada =
+            document.getElementById('linhaSelecionada');
+    
         let indiceSelecionado = -1;
         let timerAtualizacao;
-
-        // Realça no gráfico a LB que está sendo observada no momento.
+        let chart;
+    
+    
+        // =========================================================
+        // CARREGAR DADOS DO SUPABASE
+        // =========================================================
+    
+        async function carregarDadosSupabase() {
+    
+            const { data, error } = await supabaseClient
+                .from('painel_notas')
+                .select(`
+                    id,
+                    linha,
+                    amarela,
+                    vermelha,
+                    nd,
+                    programado,
+                    material_andamento,
+                    preventiva,
+                    amarela_vencida,
+                    vermelha_vencida,
+                    nd_vencida,
+                    dias_amarela,
+                    dias_vermelha,
+                    dias_nd
+                `);
+    
+            if (error) {
+                console.error(
+                    'Erro ao carregar dados do Supabase:',
+                    error
+                );
+    
+                alert(
+                    'Não foi possível carregar os dados do painel.'
+                );
+    
+                return false;
+            }
+    
+    
+            // Mantém a ordem correta do gráfico
+            dadosPainel = labels.map(linha => {
+    
+                const registro = data.find(
+                    item => item.linha === linha
+                );
+    
+                if (!registro) {
+                    console.warn(
+                        `Nenhum registro encontrado para ${linha}`
+                    );
+                }
+    
+                return registro;
+            });
+    
+    
+            // =====================================================
+            // NOTAS ATUAIS
+            // =====================================================
+    
+            atuais.amarela = dadosPainel.map(
+                item => item?.amarela ?? 0
+            );
+    
+            atuais.vermelha = dadosPainel.map(
+                item => item?.vermelha ?? 0
+            );
+    
+            atuais.nd = dadosPainel.map(
+                item => item?.nd ?? 0
+            );
+    
+    
+            // =====================================================
+            // VENCIDAS
+            // =====================================================
+    
+            vencidas.amarela = dadosPainel.map(
+                item => item?.amarela_vencida ?? 0
+            );
+    
+            vencidas.vermelha = dadosPainel.map(
+                item => item?.vermelha_vencida ?? 0
+            );
+    
+            vencidas.nd = dadosPainel.map(
+                item => item?.nd_vencida ?? 0
+            );
+    
+    
+            // =====================================================
+            // DIAS VENCIDOS
+            // =====================================================
+    
+            diasPorCategoria.amarela = dadosPainel.map(
+                item => item?.dias_amarela ?? '—'
+            );
+    
+            diasPorCategoria.vermelha = dadosPainel.map(
+                item => item?.dias_vermelha ?? '—'
+            );
+    
+            diasPorCategoria.nd = dadosPainel.map(
+                item => item?.dias_nd ?? '—'
+            );
+    
+    
+            // =====================================================
+            // STATUS OPERACIONAL
+            // =====================================================
+    
+            programado = dadosPainel.map(
+                item => item?.programado ?? 0
+            );
+    
+            materialAndamento = dadosPainel.map(
+                item => item?.material_andamento ?? 0
+            );
+    
+            preventiva = dadosPainel.map(
+                item => item?.preventiva ?? 0
+            );
+    
+    
+            console.log(
+                'Dados carregados do Supabase:',
+                dadosPainel
+            );
+    
+            return true;
+        }
+    
+    
+        // =========================================================
+        // ATUALIZAR CARDS SUPERIORES E TABELA
+        // =========================================================
+    
+        function atualizarResumoETabela() {
+    
+            // =========================================
+            // TOTAIS SUPERIORES
+            // =========================================
+    
+            const totalAmarela =
+                atuais.amarela.reduce(
+                    (soma, valor) =>
+                        soma + Number(valor || 0),
+                    0
+                );
+    
+            const totalVermelha =
+                atuais.vermelha.reduce(
+                    (soma, valor) =>
+                        soma + Number(valor || 0),
+                    0
+                );
+    
+            const totalNd =
+                atuais.nd.reduce(
+                    (soma, valor) =>
+                        soma + Number(valor || 0),
+                    0
+                );
+    
+            const totalGeral =
+                totalAmarela +
+                totalVermelha +
+                totalNd;
+    
+    
+            const elTotalAmarela =
+                document.getElementById('totalAmarela');
+    
+            const elTotalVermelha =
+                document.getElementById('totalVermelha');
+    
+            const elTotalNd =
+                document.getElementById('totalNd');
+    
+            const elTotalGeral =
+                document.getElementById('totalGeral');
+    
+    
+            if (elTotalAmarela) {
+                elTotalAmarela.textContent =
+                    totalAmarela;
+            }
+    
+            if (elTotalVermelha) {
+                elTotalVermelha.textContent =
+                    totalVermelha;
+            }
+    
+            if (elTotalNd) {
+                elTotalNd.textContent =
+                    totalNd;
+            }
+    
+            if (elTotalGeral) {
+                elTotalGeral.textContent =
+                    totalGeral;
+            }
+    
+    
+            // =========================================
+            // TABELA DETALHAMENTO POR LINHA
+            // =========================================
+    
+            document
+                .querySelectorAll(
+                    '#detalhamentoBody td[data-linha][data-field]'
+                )
+                .forEach(celula => {
+    
+                    const linha =
+                        celula.dataset.linha;
+    
+                    const campo =
+                        celula.dataset.field;
+    
+                    const registro =
+                        dadosPainel.find(
+                            item =>
+                                item?.linha === linha
+                        );
+    
+    
+                    if (!registro) {
+                        celula.textContent = '0';
+                        return;
+                    }
+    
+    
+                    celula.textContent =
+                        registro[campo] ?? 0;
+                });
+        }
+    
+    
+        // =========================================================
+        // REALCE DA LINHA NO GRÁFICO
+        // =========================================================
+    
         const destaqueLinhaPlugin = {
+    
             id: 'destaqueLinha',
+    
             beforeDatasetsDraw(chart) {
-                if (indiceSelecionado < 0) return;
-                const { ctx, chartArea, scales } = chart;
+    
+                if (indiceSelecionado < 0) {
+                    return;
+                }
+    
+                const {
+                    ctx,
+                    chartArea,
+                    scales
+                } = chart;
+    
                 const x = scales.x;
-                const centro = x.getPixelForValue(indiceSelecionado);
-                const anterior = indiceSelecionado > 0 ? x.getPixelForValue(indiceSelecionado - 1) : centro - (x.getPixelForValue(1) - centro);
-                const proximo = indiceSelecionado < labels.length - 1 ? x.getPixelForValue(indiceSelecionado + 1) : centro + (centro - x.getPixelForValue(indiceSelecionado - 1));
-                const largura = Math.min(Math.abs(proximo - centro), Math.abs(centro - anterior)) * .82;
-
+    
+                const centro =
+                    x.getPixelForValue(
+                        indiceSelecionado
+                    );
+    
+                let anterior;
+                let proximo;
+    
+    
+                if (indiceSelecionado > 0) {
+    
+                    anterior =
+                        x.getPixelForValue(
+                            indiceSelecionado - 1
+                        );
+    
+                } else {
+    
+                    anterior =
+                        centro -
+                        (
+                            x.getPixelForValue(1) -
+                            centro
+                        );
+                }
+    
+    
+                if (
+                    indiceSelecionado <
+                    labels.length - 1
+                ) {
+    
+                    proximo =
+                        x.getPixelForValue(
+                            indiceSelecionado + 1
+                        );
+    
+                } else {
+    
+                    proximo =
+                        centro +
+                        (
+                            centro -
+                            x.getPixelForValue(
+                                indiceSelecionado - 1
+                            )
+                        );
+                }
+    
+    
+                const largura =
+                    Math.min(
+                        Math.abs(proximo - centro),
+                        Math.abs(centro - anterior)
+                    ) * .82;
+    
+    
                 ctx.save();
-                ctx.fillStyle = 'rgba(52, 152, 219, .09)';
-                ctx.strokeStyle = 'rgba(52, 152, 219, .40)';
+    
+                ctx.fillStyle =
+                    'rgba(52, 152, 219, .09)';
+    
+                ctx.strokeStyle =
+                    'rgba(52, 152, 219, .40)';
+    
                 ctx.lineWidth = 1.5;
+    
                 ctx.beginPath();
-                ctx.roundRect(centro - largura / 2, chartArea.top, largura, chartArea.bottom - chartArea.top, 8);
+    
+                ctx.roundRect(
+                    centro - largura / 2,
+                    chartArea.top,
+                    largura,
+                    chartArea.bottom -
+                    chartArea.top,
+                    8
+                );
+    
                 ctx.fill();
                 ctx.stroke();
+    
                 ctx.restore();
             }
         };
-
+    
+    
+        // =========================================================
+        // ATUALIZAR PAINEL DE VENCIMENTO
+        // =========================================================
+    
         function atualizarVencimento(i) {
-            if (i === indiceSelecionado) return;
-            indiceSelecionado = i;
-            chart.draw();
-
-            panel.classList.add('atualizando');
-            linhaSelecionada.classList.add('trocando');
-            clearTimeout(timerAtualizacao);
-
-            timerAtualizacao = setTimeout(() => {
-
-                const a = vencidas.amarela[i];
-                const v = vencidas.vermelha[i];
-                const n = vencidas.nd[i];
-
-                linhaSelecionada.textContent = labels[i];
-
-                document.getElementById('totalVencidas').textContent = a + v + n;
-
-                document.getElementById('amarelaVencida').textContent = a;
-                document.getElementById('vermelhaVencida').textContent = v;
-                document.getElementById('ndVencida').textContent = n;
-
-
-                // =========================================
-                // STATUS OPERACIONAL
-                // =========================================
-
-                const cardProgramado =
-                    document.getElementById('cardProgramado');
-
-                const cardMaterialAndamento =
-                    document.getElementById('cardMaterialAndamento');
-
-                const programadoLabel =
-                    document.getElementById('programadoLabel');
-
-                const programadoValor =
-                    document.getElementById('programado');
-
-
-                // Linha 1
-                if (i === 0) {
-
-                    programadoLabel.textContent = 'Preventiva';
-
-                    programadoValor.textContent =
-                        preventiva[i] === null ? '—' : preventiva[i];
-
-                    cardMaterialAndamento.style.display = 'none';
-
-                } else {
-
-                    programadoLabel.textContent = 'Programado';
-
-                    programadoValor.textContent =
-                        programado[i] === null ? '—' : programado[i];
-
-                    cardMaterialAndamento.style.display = 'flex';
-
-                    document.getElementById('materialAndamento').textContent =
-                        materialAndamento[i] === null
-                            ? '—'
-                            : materialAndamento[i];
-                }
-
-
-                // =========================================
-                // DIAS VENCIDOS
-                // =========================================
-
-                document.getElementById('diasAmarela').textContent =
-                    a ? diasPorCategoria.amarela[i] : 'Sem vencidas';
-
-                document.getElementById('diasVermelha').textContent =
-                    v ? diasPorCategoria.vermelha[i] : 'Sem vencidas';
-
-                document.getElementById('diasNd').textContent =
-                    n ? diasPorCategoria.nd[i] : 'Sem vencidas';
-
-
-                document.getElementById('cardAmarela')
-                    .classList.toggle('sem-vencidas', a === 0);
-
-                document.getElementById('cardVermelha')
-                    .classList.toggle('sem-vencidas', v === 0);
-
-                document.getElementById('cardNd')
-                    .classList.toggle('sem-vencidas', n === 0);
-
-
-                panel.classList.add('aberto');
-                panel.classList.remove('atualizando');
-                panel.classList.remove('pulso');
-
-                void panel.offsetWidth;
-
-                panel.classList.add('pulso');
-                linhaSelecionada.classList.remove('trocando');
-
-            }, 120);
-        }
-
-        const chart = new Chart(document.getElementById('notasChart').getContext('2d'), {
-            type: 'bar',
-            data: {
-                labels,
-                datasets: [
-                    { label: 'Amarela', data: atuais.amarela, backgroundColor: '#f1c40f' },
-                    { label: 'Vermelha', data: atuais.vermelha, backgroundColor: '#e74c3c' },
-                    { label: 'ND', data: atuais.nd, backgroundColor: '#7f8c8d' }
-                ]
-            },
-            plugins: [destaqueLinhaPlugin],
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: { mode: 'index', intersect: false },
-                plugins: {
-                    legend: { position: 'top' },
-                    tooltip: { callbacks: { afterBody: () => [] } }
-                },
-                scales: {
-                    x: { stacked: true, title: { display: true, text: '' } },
-                    y: { stacked: true, beginAtZero: true, title: { display: true, text: 'Quantidade de notas' }, ticks: { stepSize: 10 } }
-                },
-                onHover: function (event, elements) {
-                    if (!elements.length) return;
-                    atualizarVencimento(elements[0].index);
-                }
+    
+            if (i === indiceSelecionado) {
+                return;
             }
-        });
+    
+            indiceSelecionado = i;
+    
+            if (chart) {
+                chart.draw();
+            }
+    
+    
+            panel.classList.add(
+                'atualizando'
+            );
+    
+            linhaSelecionada
+                .classList
+                .add('trocando');
+    
+            clearTimeout(
+                timerAtualizacao
+            );
+    
+    
+            timerAtualizacao =
+                setTimeout(() => {
+    
+    
+                    // =============================================
+                    // VENCIDAS
+                    // =============================================
+    
+                    const a =
+                        vencidas.amarela[i];
+    
+                    const v =
+                        vencidas.vermelha[i];
+    
+                    const n =
+                        vencidas.nd[i];
+    
+    
+                    linhaSelecionada.textContent =
+                        labels[i];
+    
+    
+                    document
+                        .getElementById(
+                            'totalVencidas'
+                        )
+                        .textContent =
+                        a + v + n;
+    
+    
+                    document
+                        .getElementById(
+                            'amarelaVencida'
+                        )
+                        .textContent = a;
+    
+    
+                    document
+                        .getElementById(
+                            'vermelhaVencida'
+                        )
+                        .textContent = v;
+    
+    
+                    document
+                        .getElementById(
+                            'ndVencida'
+                        )
+                        .textContent = n;
+    
+    
+                    // =============================================
+                    // STATUS OPERACIONAL
+                    // =============================================
+    
+                    const cardProgramado =
+                        document.getElementById(
+                            'cardProgramado'
+                        );
+    
+                    const cardMaterialAndamento =
+                        document.getElementById(
+                            'cardMaterialAndamento'
+                        );
+    
+                    const programadoLabel =
+                        document.getElementById(
+                            'programadoLabel'
+                        );
+    
+                    const programadoValor =
+                        document.getElementById(
+                            'programado'
+                        );
+    
+    
+                    // =============================================
+                    // LINHA 1 = PREVENTIVA
+                    // =============================================
+    
+                    if (i === 0) {
+    
+                        programadoLabel.textContent =
+                            'Preventiva';
+    
+                        programadoValor.textContent =
+                            preventiva[i] ?? '—';
+    
+    
+                        if (cardMaterialAndamento) {
+                            cardMaterialAndamento
+                                .style
+                                .display = 'none';
+                        }
+    
+    
+                        if (cardProgramado) {
+                            cardProgramado
+                                .style
+                                .gridColumn = '1 / -1';
+                        }
+    
+    
+                        const editarProgramado =
+                            document.getElementById(
+                                'editarProgramado'
+                            );
+    
+                        if (editarProgramado) {
+                            editarProgramado.dataset.field =
+                                'preventiva';
+    
+                            editarProgramado.dataset.label =
+                                'Preventiva';
+                        }
+    
+                    } else {
+    
+                        // =========================================
+                        // DEMAIS LINHAS
+                        // =========================================
+    
+                        programadoLabel.textContent =
+                            'Programado';
+    
+                        programadoValor.textContent =
+                            programado[i] ?? 0;
+    
+    
+                        if (cardMaterialAndamento) {
+                            cardMaterialAndamento
+                                .style
+                                .display = 'flex';
+                        }
+    
+    
+                        if (cardProgramado) {
+                            cardProgramado
+                                .style
+                                .gridColumn = 'auto';
+                        }
+    
+    
+                        document
+                            .getElementById(
+                                'materialAndamento'
+                            )
+                            .textContent =
+                            materialAndamento[i] ?? 0;
+    
+    
+                        const editarProgramado =
+                            document.getElementById(
+                                'editarProgramado'
+                            );
+    
+                        if (editarProgramado) {
+                            editarProgramado.dataset.field =
+                                'programado';
+    
+                            editarProgramado.dataset.label =
+                                'Programado';
+                        }
+                    }
+    
+    
+                    // =============================================
+                    // DIAS VENCIDOS
+                    // =============================================
+    
+                    document
+                        .getElementById(
+                            'diasAmarela'
+                        )
+                        .textContent =
+                        a > 0
+                            ? diasPorCategoria.amarela[i]
+                            : 'Sem vencidas';
+    
+    
+                    document
+                        .getElementById(
+                            'diasVermelha'
+                        )
+                        .textContent =
+                        v > 0
+                            ? diasPorCategoria.vermelha[i]
+                            : 'Sem vencidas';
+    
+    
+                    document
+                        .getElementById(
+                            'diasNd'
+                        )
+                        .textContent =
+                        n > 0
+                            ? diasPorCategoria.nd[i]
+                            : 'Sem vencidas';
+    
+    
+                    // =============================================
+                    // ESTILO DOS CARDS SEM VENCIDAS
+                    // =============================================
+    
+                    document
+                        .getElementById(
+                            'cardAmarela'
+                        )
+                        .classList
+                        .toggle(
+                            'sem-vencidas',
+                            a === 0
+                        );
+    
+    
+                    document
+                        .getElementById(
+                            'cardVermelha'
+                        )
+                        .classList
+                        .toggle(
+                            'sem-vencidas',
+                            v === 0
+                        );
+    
+    
+                    document
+                        .getElementById(
+                            'cardNd'
+                        )
+                        .classList
+                        .toggle(
+                            'sem-vencidas',
+                            n === 0
+                        );
+    
+    
+                    // =============================================
+                    // ANIMAÇÃO
+                    // =============================================
+    
+                    panel.classList.add(
+                        'aberto'
+                    );
+    
+                    panel.classList.remove(
+                        'atualizando'
+                    );
+    
+                    panel.classList.remove(
+                        'pulso'
+                    );
+    
+                    void panel.offsetWidth;
+    
+                    panel.classList.add(
+                        'pulso'
+                    );
+    
+                    linhaSelecionada
+                        .classList
+                        .remove('trocando');
+    
+    
+                }, 120);
+        }
+    
+    
+        // =========================================================
+        // CRIAR GRÁFICO
+        // =========================================================
+    
+        function criarGrafico() {
+    
+            const canvas =
+                document.getElementById(
+                    'notasChart'
+                );
+    
+    
+            if (!canvas) {
+                console.error(
+                    'Canvas notasChart não encontrado.'
+                );
+    
+                return;
+            }
+    
+    
+            chart = new Chart(
+                canvas.getContext('2d'),
+                {
+    
+                    type: 'bar',
+    
+                    data: {
+    
+                        labels,
+    
+                        datasets: [
+    
+                            {
+                                label: 'Amarela',
+                                data:
+                                    atuais.amarela,
+                                backgroundColor:
+                                    '#f1c40f'
+                            },
+    
+                            {
+                                label: 'Vermelha',
+                                data:
+                                    atuais.vermelha,
+                                backgroundColor:
+                                    '#e74c3c'
+                            },
+    
+                            {
+                                label: 'ND',
+                                data:
+                                    atuais.nd,
+                                backgroundColor:
+                                    '#7f8c8d'
+                            }
+    
+                        ]
+                    },
+    
+    
+                    plugins: [
+                        destaqueLinhaPlugin
+                    ],
+    
+    
+                    options: {
+    
+                        responsive: true,
+    
+                        maintainAspectRatio:
+                            false,
+    
+    
+                        interaction: {
+                            mode: 'index',
+                            intersect: false
+                        },
+    
+    
+                        plugins: {
+    
+                            legend: {
+                                position: 'top'
+                            },
+    
+                            tooltip: {
+    
+                                callbacks: {
+    
+                                    afterBody:
+                                        () => []
+                                }
+                            }
+                        },
+    
+    
+                        scales: {
+    
+                            x: {
+    
+                                stacked: true,
+    
+                                title: {
+                                    display: true,
+                                    text: ''
+                                }
+                            },
+    
+    
+                            y: {
+    
+                                stacked: true,
+    
+                                beginAtZero: true,
+    
+                                title: {
+                                    display: true,
+                                    text:
+                                        'Quantidade de notas'
+                                },
+    
+                                ticks: {
+                                    stepSize: 10
+                                }
+                            }
+                        },
+    
+    
+                        onHover:
+                            function (
+                                event,
+                                elements
+                            ) {
+    
+                                if (
+                                    !elements.length
+                                ) {
+                                    return;
+                                }
+    
+    
+                                atualizarVencimento(
+                                    elements[0]
+                                        .index
+                                );
+                            }
+                    }
+                }
+            );
+        }
+    
+    
+        // =========================================================
+        // ATUALIZAR GRÁFICO SEM RECRIAR
+        // =========================================================
+    
+        function atualizarGrafico() {
+    
+            if (!chart) {
+                return;
+            }
+    
+    
+            chart.data.datasets[0].data =
+                atuais.amarela;
+    
+            chart.data.datasets[1].data =
+                atuais.vermelha;
+    
+            chart.data.datasets[2].data =
+                atuais.nd;
+    
+    
+            chart.update();
+        }
+    
+    
+        // =========================================================
+        // RECARREGAR TUDO DO SUPABASE
+        // =========================================================
+    
+        async function recarregarPainel() {
+    
+            const carregou =
+                await carregarDadosSupabase();
+    
+    
+            if (!carregou) {
+                return;
+            }
+    
+    
+            atualizarResumoETabela();
+    
+            atualizarGrafico();
+    
+    
+            // Se uma linha já estava selecionada,
+            // força a atualização do painel dela.
+    
+            if (indiceSelecionado >= 0) {
+    
+                const indiceAnterior =
+                    indiceSelecionado;
+    
+                indiceSelecionado = -1;
+    
+                atualizarVencimento(
+                    indiceAnterior
+                );
+            }
+        }
+    
+    
+        // =========================================================
+        // INICIAR APLICAÇÃO
+        // =========================================================
+    
+        async function iniciarAplicacao() {
+    
+            const carregou =
+                await carregarDadosSupabase();
+    
+    
+            if (!carregou) {
+                return;
+            }
+    
+    
+            atualizarResumoETabela();
+    
+            criarGrafico();
+        }
+    
+    
+        iniciarAplicacao();
+    
     </script>
 </body>
 
