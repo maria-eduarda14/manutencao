@@ -1327,7 +1327,7 @@
                 <div class="status-grid">
 
 
-                    <!-- PROGRAMADO / PREVENTIVA -->
+                    <!-- PROGRAMADO -->
                     <div id="cardProgramado" class="vencimento-item programado-item">
 
                         <button id="editarProgramado" type="button" class="edit-btn admin-only" data-field="programado"
@@ -2422,33 +2422,29 @@
                             n;
 
 
-                        // =================================================
-                        // STATUS
-                        // =================================================
+                        // =============================================
+                        // STATUS OPERACIONAL
+                        // =============================================
 
                         const cardProgramado =
                             document.getElementById(
                                 'cardProgramado'
                             );
 
-
                         const cardMaterialAndamento =
                             document.getElementById(
                                 'cardMaterialAndamento'
                             );
-
 
                         const programadoLabel =
                             document.getElementById(
                                 'programadoLabel'
                             );
 
-
                         const programadoValor =
                             document.getElementById(
                                 'programado'
                             );
-
 
                         const editarProgramado =
                             document.getElementById(
@@ -2456,129 +2452,90 @@
                             );
 
 
-                        // =================================================
-                        // LINHA 1 = PREVENTIVA
-                        // =================================================
+                        // =============================================
+                        // PROGRAMADO - TODAS AS LINHAS
+                        // =============================================
 
-                        if (i === 0) {
+                        programadoLabel.textContent =
+                            'Programado';
 
-                            programadoLabel.textContent =
-                                'Preventiva';
-
-
-                            programadoValor.textContent =
-                                preventiva[i]
-                                ??
-                                0;
+                        programadoValor.textContent =
+                            programado[i] ?? 0;
 
 
-                            if (
-                                cardMaterialAndamento
-                            ) {
+                        // No admin, o lápis sempre edita Programado
+                        if (editarProgramado) {
+
+                            editarProgramado.dataset.field =
+                                'programado';
+
+                            editarProgramado.dataset.label =
+                                'Programado';
+                        }
+
+
+                        // =============================================
+                        // LINHA 4 = SOMENTE PROGRAMADO
+                        // =============================================
+
+                        if (i === 3) {
+
+                            // Esconde Material em Andamento
+                            if (cardMaterialAndamento) {
 
                                 cardMaterialAndamento
                                     .style
-                                    .display =
-                                    'none';
+                                    .display = 'none';
                             }
 
 
-                            if (
-                                cardProgramado
-                            ) {
+                            // Programado ocupa toda a largura
+                            if (cardProgramado) {
 
                                 cardProgramado
                                     .style
-                                    .gridColumn =
-                                    '1 / -1';
-                            }
-
-
-                            if (
-                                editarProgramado
-                            ) {
-
-                                editarProgramado
-                                    .dataset
-                                    .field =
-                                    'preventiva';
-
-
-                                editarProgramado
-                                    .dataset
-                                    .label =
-                                    'Preventiva';
+                                    .gridColumn = '1 / -1';
                             }
 
                         } else {
 
-                            // =================================================
-                            // OUTRAS LINHAS
-                            // =================================================
+                            // =========================================
+                            // TODAS AS OUTRAS LINHAS
+                            // =========================================
 
-                            programadoLabel.textContent =
-                                'Programado';
-
-
-                            programadoValor.textContent =
-                                programado[i]
-                                ??
-                                0;
-
-
-                            if (
-                                cardMaterialAndamento
-                            ) {
+                            if (cardMaterialAndamento) {
 
                                 cardMaterialAndamento
                                     .style
-                                    .display =
-                                    'flex';
+                                    .display = 'flex';
                             }
 
 
-                            if (
-                                cardProgramado
-                            ) {
+                            if (cardProgramado) {
 
                                 cardProgramado
                                     .style
-                                    .gridColumn =
-                                    'auto';
+                                    .gridColumn = 'auto';
                             }
 
 
-                            document
-                                .getElementById(
+                            const materialAndamentoValor =
+                                document.getElementById(
                                     'materialAndamento'
-                                )
-                                .textContent =
-                                materialAndamento[i]
-                                ??
-                                0;
+                                );
 
 
-                            if (
-                                editarProgramado
-                            ) {
+                            if (materialAndamentoValor) {
 
-                                editarProgramado
-                                    .dataset
-                                    .field =
-                                    'programado';
-
-
-                                editarProgramado
-                                    .dataset
-                                    .label =
-                                    'Programado';
+                                materialAndamentoValor.textContent =
+                                    materialAndamento[i] ?? 0;
                             }
                         }
 
 
-                        // =================================================
-                        // DIAS
-                        // =================================================
+                        // =============================================
+                        // DIAS VENCIDOS
+                        // =============================================
 
                         document
                             .getElementById(
