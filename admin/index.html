@@ -986,6 +986,43 @@
                 max-width: 170px;
             }
         }
+
+
+        /* =========================================================
+           ALINHAMENTO DOS TÍTULOS E VALORES DOS CARDS DE STATUS
+        ========================================================= */
+
+        .total-vencidas,
+        .programado-item,
+        .andamento-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .total-vencidas .label,
+        .total-vencidas .value,
+        .programado-item .label,
+        .programado-item .value,
+        .andamento-item .label,
+        .andamento-item .value {
+            width: 100%;
+            text-align: center;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        /* No admin, evita que o espaço reservado para o lápis
+           desloque os títulos desses cards para a esquerda. */
+        body.admin-mode .total-vencidas > .label,
+        body.admin-mode .programado-item > .label,
+        body.admin-mode .andamento-item > .label {
+            padding-left: 0;
+            padding-right: 0;
+        }
+
     </style>
 </head>
 
