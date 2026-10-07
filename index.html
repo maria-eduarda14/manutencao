@@ -802,6 +802,390 @@
             padding-right: 0;
         }
 
+    
+        /* =========================================================
+           NOVO RESUMO: MELHORIA + VENCIDAS
+        ========================================================= */
+
+        .cards {
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+        }
+
+        .improvement {
+            border-left: 5px solid #2ecc71;
+        }
+
+        .improvement .card-value {
+            color: #218c55;
+        }
+
+        .improvement .card-value.negativa,
+        .melhoria-value.negativa {
+            color: #e74c3c;
+        }
+
+        .improvement .card-value.neutra,
+        .melhoria-value.neutra {
+            color: #7f8c8d;
+        }
+
+        .resumo-linha-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 12px;
+            padding: 18px 22px 14px;
+            transition: opacity .16s ease, transform .16s ease;
+        }
+
+        .vencimento-panel.atualizando .resumo-linha-grid {
+            opacity: .35;
+            transform: translateY(5px);
+        }
+
+        .resumo-item {
+            position: relative;
+            min-width: 0;
+            min-height: 128px;
+            padding: 18px 14px;
+            border: 1px solid #e8eaec;
+            border-radius: 9px;
+            background: #f7f8f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .atual-item {
+            border-left: 4px solid #3498db;
+        }
+
+        .melhoria-item {
+            border-left: 4px solid #2ecc71;
+        }
+
+        .vencidas-item {
+            border-left: 4px solid #e74c3c;
+        }
+
+        .programadas-item {
+            border-left: 4px solid #8e44ad;
+        }
+
+        .reavaliacao-item {
+            border-left: 4px solid #f39c12;
+        }
+
+        .resumo-label {
+            width: 100%;
+            padding: 0 34px;
+            margin-bottom: 8px;
+            color: #5f666d;
+            font-size: 14px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .resumo-value {
+            width: 100%;
+            color: #222;
+            font-size: 32px;
+            font-weight: 800;
+            line-height: 1.05;
+            text-align: center;
+        }
+
+        .melhoria-value {
+            color: #218c55;
+        }
+
+        .resumo-sub {
+            width: 100%;
+            margin-top: 8px;
+            color: #8a9299;
+            font-size: 11px;
+            line-height: 1.35;
+            text-align: center;
+        }
+
+        .resumo-frase {
+            margin: 2px 22px 18px;
+            padding: 11px 14px;
+            border-radius: 8px;
+            background: #f3f6f8;
+            color: #59636d;
+            font-size: 13px;
+            line-height: 1.45;
+            text-align: center;
+        }
+
+        body.admin-mode .resumo-item .resumo-label {
+            padding-left: 34px;
+            padding-right: 34px;
+        }
+
+        @media(max-width:1100px) {
+            .cards {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            .resumo-linha-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media(max-width:700px) {
+            .cards {
+                grid-template-columns: 1fr;
+            }
+
+            .resumo-linha-grid {
+                grid-template-columns: 1fr;
+                padding: 14px 18px 12px;
+            }
+
+            .resumo-item {
+                min-height: 108px;
+            }
+
+            .resumo-frase {
+                margin: 2px 18px 16px;
+            }
+        }
+
+
+        /* =========================================================
+           INFORMAÇÕES ADICIONAIS FLEXÍVEIS
+        ========================================================= */
+        .resumo-linha-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .info-adicional-section {
+            margin: 2px 22px 14px;
+            padding: 16px;
+            border: 1px solid #e3e7ea;
+            border-radius: 10px;
+            background: #fbfcfd;
+        }
+
+        .info-adicional-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 12px;
+        }
+
+        .info-adicional-titulo {
+            color: #333;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .info-adicional-subtitulo {
+            margin-top: 3px;
+            color: #8a9299;
+            font-size: 11px;
+            line-height: 1.35;
+        }
+
+        .info-adicional-lista {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .info-adicional-item {
+            position: relative;
+            min-width: 0;
+            padding: 14px 44px 14px 14px;
+            border: 1px solid #e5e8eb;
+            border-left: 4px solid #8e44ad;
+            border-radius: 8px;
+            background: #fff;
+        }
+
+        .info-adicional-item-titulo {
+            color: #5f666d;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.3;
+            overflow-wrap: anywhere;
+        }
+
+        .info-adicional-item-valor {
+            margin-top: 5px;
+            color: #222;
+            font-size: 26px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .info-adicional-acoes {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .info-mini-btn {
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #dce2e7;
+            border-radius: 7px;
+            background: #fff;
+            color: #66727d;
+            cursor: pointer;
+        }
+
+        .info-mini-btn:hover {
+            color: #2980b9;
+            background: #f5faff;
+        }
+
+        .info-mini-btn.delete:hover {
+            color: #c0392b;
+            background: #fff5f4;
+            border-color: #f0c7c2;
+        }
+
+        .info-adicional-vazio {
+            grid-column: 1 / -1;
+            padding: 12px;
+            border: 1px dashed #d8dde1;
+            border-radius: 8px;
+            color: #92989d;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .add-info-btn {
+            align-items: center;
+            justify-content: center;
+            min-height: 36px;
+            padding: 8px 12px;
+            border: 1px solid #c9e2f4;
+            border-radius: 8px;
+            background: #eef7fd;
+            color: #2479ad;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .add-info-btn:hover {
+            background: #e2f1fb;
+        }
+
+        .info-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 10020;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(25, 32, 38, .45);
+        }
+
+        .info-modal.oculto {
+            display: none;
+        }
+
+        .info-modal-box {
+            width: min(420px, 100%);
+            padding: 24px;
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: 0 12px 34px rgba(0,0,0,.18);
+        }
+
+        .info-modal-box h3 {
+            margin-bottom: 6px;
+            color: #222;
+            font-size: 19px;
+        }
+
+        .info-modal-box p {
+            margin-bottom: 18px;
+            color: #777;
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .info-modal-box label {
+            display: block;
+            margin: 12px 0 6px;
+            color: #555;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .info-modal-box input {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid #d8dde1;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        .info-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .info-modal-actions button {
+            min-height: 38px;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .info-cancelar-btn {
+            border: 1px solid #d9dee2;
+            background: #fff;
+            color: #555;
+        }
+
+        .info-salvar-btn {
+            border: 1px solid #3498db;
+            background: #3498db;
+            color: #fff;
+        }
+
+        @media(max-width:900px) {
+            .info-adicional-lista {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media(max-width:600px) {
+            .resumo-linha-grid,
+            .info-adicional-lista {
+                grid-template-columns: 1fr;
+            }
+
+            .info-adicional-section {
+                margin: 2px 18px 14px;
+            }
+
+            .info-adicional-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+
     </style>
 </head>
 
@@ -854,6 +1238,11 @@
                 <div id="totalGeral" class="card-value">0</div>
             </div>
 
+            <div class="card improvement">
+                <div class="card-title">Melhoria Geral</div>
+                <div id="melhoriaGeral" class="card-value">—</div>
+            </div>
+
         </section>
 
 
@@ -885,216 +1274,60 @@
              PAINEL DE VENCIMENTO
         ========================================== -->
         <section id="vencimentoPanel" class="vencimento-panel">
-
             <div class="vencimento-header">
-
-                <h3>Informações de vencimento</h3>
-
-                <span id="linhaSelecionada" class="linha-selecionada">
-                    —
-                </span>
-
+                <h3>Evolução e situação da linha</h3>
+                <span id="linhaSelecionada" class="linha-selecionada">—</span>
             </div>
-
-
-            <div class="vencimento-grid">
-
-                <!-- TOTAL VENCIDAS -->
-                <div class="vencimento-item total-vencidas">
-
-                    <span class="label">
-                        Total vencidas
-                    </span>
-
-                    <span id="totalVencidas" class="value">
-                        0
-                    </span>
-
-                    <!-- Não tem lápis:
-                         total é calculado automaticamente -->
-
+            <div class="resumo-linha-grid">
+                <div class="resumo-item atual-item">
+                    <span class="resumo-label">Total atual</span>
+                    <span id="totalAtualLinha" class="resumo-value">0</span>
+                    <span class="resumo-sub">notas/etiquetas no gráfico</span>
                 </div>
 
+                <div class="resumo-item melhoria-item">
+                    <button type="button" class="edit-btn admin-only"
+                        data-field="valor_base"
+                        data-label="Valor base"
+                        aria-label="Editar valor base">✎</button>
 
-                <!-- AMARELAS -->
-                <div id="cardAmarela" class="vencimento-item amarela-vencida">
+                    <span class="resumo-label">Melhoria desde o início</span>
+                    <span id="melhoriaLinha" class="resumo-value melhoria-value">—</span>
+                    <span id="comparacaoBaseLinha" class="resumo-sub">Base não definida</span>
+                </div>
 
-                    <button type="button" class="edit-btn admin-only" data-field="amarela_vencida"
-                        data-label="Amarelas vencidas" aria-label="Editar amarelas vencidas">
-                        ✎
+                <div class="resumo-item vencidas-item">
+                    <button type="button" class="edit-btn admin-only"
+                        data-field="vencidas_total"
+                        data-label="Total de vencidas"
+                        aria-label="Editar total de vencidas">✎</button>
+
+                    <span class="resumo-label">Vencidas</span>
+                    <span id="vencidasTotalLinha" class="resumo-value">0</span>
+                    <span class="resumo-sub">total da linha</span>
+                </div>
+            </div>
+
+            <div id="informacoesAdicionaisSection" class="info-adicional-section">
+                <div class="info-adicional-header">
+                    <div>
+                        <div class="info-adicional-titulo">Informações das vencidas</div>
+                        <div class="info-adicional-subtitulo">Adicione somente os detalhes que fizerem sentido para esta linha.</div>
+                    </div>
+
+                    <button id="btnAdicionarInformacao" type="button" class="add-info-btn admin-only">
+                        + Adicionar informação
                     </button>
-
-                    <span class="label">
-                        Amarelas vencidas
-                    </span>
-
-                    <span id="amarelaVencida" class="value">
-                        0
-                    </span>
-
-
-                    <div class="dias-container">
-
-                        <span class="dias-label">
-                            Tempo vencido
-                        </span>
-
-                        <span id="diasAmarela" class="dias-value">
-                            —
-                        </span>
-
-                        <button type="button" class="edit-btn edit-btn-small admin-only" data-field="dias_amarela"
-                            data-label="Tempo vencido - Amarela" aria-label="Editar tempo vencido das amarelas">
-                            ✎
-                        </button>
-
-                    </div>
-
                 </div>
 
-
-                <!-- VERMELHAS -->
-                <div id="cardVermelha" class="vencimento-item vermelha-vencida">
-
-                    <button type="button" class="edit-btn admin-only" data-field="vermelha_vencida"
-                        data-label="Vermelhas vencidas" aria-label="Editar vermelhas vencidas">
-                        ✎
-                    </button>
-
-                    <span class="label">
-                        Vermelhas vencidas
-                    </span>
-
-                    <span id="vermelhaVencida" class="value">
-                        0
-                    </span>
-
-
-                    <div class="dias-container">
-
-                        <span class="dias-label">
-                            Tempo vencido
-                        </span>
-
-                        <span id="diasVermelha" class="dias-value">
-                            —
-                        </span>
-
-                        <button type="button" class="edit-btn edit-btn-small admin-only" data-field="dias_vermelha"
-                            data-label="Tempo vencido - Vermelha" aria-label="Editar tempo vencido das vermelhas">
-                            ✎
-                        </button>
-
-                    </div>
-
-                </div>
-
-
-                <!-- ND -->
-                <div id="cardNd" class="vencimento-item nd-vencida">
-
-                    <button type="button" class="edit-btn admin-only" data-field="nd_vencida" data-label="ND vencidas"
-                        aria-label="Editar ND vencidas">
-                        ✎
-                    </button>
-
-                    <span class="label">
-                        ND vencidas
-                    </span>
-
-                    <span id="ndVencida" class="value">
-                        0
-                    </span>
-
-
-                    <div class="dias-container">
-
-                        <span class="dias-label">
-                            Tempo vencido
-                        </span>
-
-                        <span id="diasNd" class="dias-value">
-                            —
-                        </span>
-
-                        <button type="button" class="edit-btn edit-btn-small admin-only" data-field="dias_nd"
-                            data-label="Tempo vencido - ND" aria-label="Editar tempo vencido das ND">
-                            ✎
-                        </button>
-
-                    </div>
-
-                </div>
-
+                <div id="informacoesAdicionaisLista" class="info-adicional-lista"></div>
             </div>
 
-
-            <!-- =====================================
-                 STATUS OPERACIONAL
-            ====================================== -->
-            <div class="status-section">
-
-                <div class="status-section-title">
-                    Status operacional
-                </div>
-
-                <div class="status-grid">
-
-
-                    <!-- PROGRAMADO -->
-                    <div id="cardProgramado" class="vencimento-item programado-item">
-
-                        <button id="editarProgramado" type="button" class="edit-btn admin-only" data-field="programado"
-                            data-label="Programado" aria-label="Editar programado">
-                            ✎
-                        </button>
-
-                        <span id="programadoLabel" class="label">
-                            Programado
-                        </span>
-
-                        <span id="programado" class="value">
-                            0
-                        </span>
-
-                    </div>
-
-
-                    <!-- MATERIAL EM ANDAMENTO -->
-                    <div id="cardMaterialAndamento" class="vencimento-item andamento-item">
-
-                        <button type="button" class="edit-btn admin-only" data-field="material_andamento"
-                            data-label="Material em Andamento" aria-label="Editar material em andamento">
-                            ✎
-                        </button>
-
-                        <span class="label">
-                            Material em Andamento
-                        </span>
-
-                        <span id="materialAndamento" class="value">
-                            0
-                        </span>
-
-                    </div>
-
-                </div>
-
+            <div id="resumoFraseLinha" class="resumo-frase">
+                Selecione uma linha no gráfico para visualizar o resumo.
             </div>
-
-
-            <div class="vencimento-hint">
-                O período mostra há quantos dias as notas estão vencidas.
-                Quando houver mais de uma nota, é exibida a faixa do menor
-                ao maior atraso.
-            </div>
-
         </section>
 
-
-        <!-- =========================================
-             DETALHAMENTO
-        ========================================== -->
         <section class="table-container">
 
             <div class="table-header">
@@ -1313,21 +1546,9 @@
             nd: []
         };
 
-        let vencidas = {
-            amarela: [],
-            vermelha: [],
-            nd: []
-        };
-
-        let diasPorCategoria = {
-            amarela: [],
-            vermelha: [],
-            nd: []
-        };
-
-        let programado = [];
-        let materialAndamento = [];
-        let preventiva = [];
+        let valorBase = [];
+        let vencidasTotal = [];
+        let informacoesAdicionais = [];
 
         let dadosPainel = [];
 
@@ -1361,120 +1582,48 @@
                     amarela,
                     vermelha,
                     nd,
-                    programado,
-                    material_andamento,
-                    preventiva,
-                    amarela_vencida,
-                    vermelha_vencida,
-                    nd_vencida,
-                    dias_amarela,
-                    dias_vermelha,
-                    dias_nd
+                    valor_base,
+                    vencidas_total
                 `);
 
             if (error) {
-                console.error(
-                    'Erro ao carregar dados do Supabase:',
-                    error
-                );
-
-                alert(
-                    'Não foi possível carregar os dados do painel.'
-                );
-
+                console.error('Erro ao carregar dados do Supabase:', error);
+                alert('Não foi possível carregar os dados do painel.');
                 return false;
             }
 
-
-            // Mantém a ordem correta do gráfico
             dadosPainel = labels.map(linha => {
-
-                const registro = data.find(
-                    item => item.linha === linha
-                );
+                const registro = data.find(item => item.linha === linha);
 
                 if (!registro) {
-                    console.warn(
-                        `Nenhum registro encontrado para ${linha}`
-                    );
+                    console.warn(`Nenhum registro encontrado para ${linha}`);
                 }
 
                 return registro;
             });
 
+            atuais.amarela = dadosPainel.map(item => item?.amarela ?? 0);
+            atuais.vermelha = dadosPainel.map(item => item?.vermelha ?? 0);
+            atuais.nd = dadosPainel.map(item => item?.nd ?? 0);
 
-            // =====================================================
-            // NOTAS ATUAIS
-            // =====================================================
+            valorBase = dadosPainel.map(item => item?.valor_base ?? 0);
+            vencidasTotal = dadosPainel.map(item => item?.vencidas_total ?? 0);
 
-            atuais.amarela = dadosPainel.map(
-                item => item?.amarela ?? 0
-            );
+            const { data: infosData, error: infosError } = await supabaseClient
+                .from('painel_notas_info')
+                .select('id, linha, titulo, quantidade, ordem')
+                .order('ordem', { ascending: true })
+                .order('id', { ascending: true });
 
-            atuais.vermelha = dadosPainel.map(
-                item => item?.vermelha ?? 0
-            );
+            if (infosError) {
+                console.error('Erro ao carregar informações adicionais:', infosError);
+                alert('Não foi possível carregar as informações adicionais do painel.');
+                return false;
+            }
 
-            atuais.nd = dadosPainel.map(
-                item => item?.nd ?? 0
-            );
+            informacoesAdicionais = infosData ?? [];
 
-
-            // =====================================================
-            // VENCIDAS
-            // =====================================================
-
-            vencidas.amarela = dadosPainel.map(
-                item => item?.amarela_vencida ?? 0
-            );
-
-            vencidas.vermelha = dadosPainel.map(
-                item => item?.vermelha_vencida ?? 0
-            );
-
-            vencidas.nd = dadosPainel.map(
-                item => item?.nd_vencida ?? 0
-            );
-
-
-            // =====================================================
-            // DIAS VENCIDOS
-            // =====================================================
-
-            diasPorCategoria.amarela = dadosPainel.map(
-                item => item?.dias_amarela ?? '—'
-            );
-
-            diasPorCategoria.vermelha = dadosPainel.map(
-                item => item?.dias_vermelha ?? '—'
-            );
-
-            diasPorCategoria.nd = dadosPainel.map(
-                item => item?.dias_nd ?? '—'
-            );
-
-
-            // =====================================================
-            // STATUS OPERACIONAL
-            // =====================================================
-
-            programado = dadosPainel.map(
-                item => item?.programado ?? 0
-            );
-
-            materialAndamento = dadosPainel.map(
-                item => item?.material_andamento ?? 0
-            );
-
-            preventiva = dadosPainel.map(
-                item => item?.preventiva ?? 0
-            );
-
-
-            console.log(
-                'Dados carregados do Supabase:',
-                dadosPainel
-            );
+            console.log('Dados carregados do Supabase:', dadosPainel);
 
             return true;
         }
@@ -1484,38 +1633,71 @@
         // ATUALIZAR CARDS SUPERIORES E TABELA
         // =========================================================
 
+        function calcularPercentualMelhoria(base, atual) {
+            const valorBaseNumero = Number(base || 0);
+            const valorAtualNumero = Number(atual || 0);
+
+            if (valorBaseNumero <= 0) {
+                return null;
+            }
+
+            return ((valorBaseNumero - valorAtualNumero) / valorBaseNumero) * 100;
+        }
+
+        function formatarPercentual(valor) {
+            if (valor === null || !Number.isFinite(valor)) {
+                return '—';
+            }
+
+            return `${valor.toFixed(1).replace('.', ',')}%`;
+        }
+
+        function aplicarClasseMelhoria(elemento, percentual) {
+            if (!elemento) {
+                return;
+            }
+
+            elemento.classList.remove('negativa', 'neutra');
+
+            if (percentual === null || percentual === 0) {
+                elemento.classList.add('neutra');
+            } else if (percentual < 0) {
+                elemento.classList.add('negativa');
+            }
+        }
+
         function atualizarResumoETabela() {
 
-            // =========================================
-            // TOTAIS SUPERIORES
-            // =========================================
+            const totalAmarela = atuais.amarela.reduce(
+                (soma, valor) => soma + Number(valor || 0),
+                0
+            );
 
-            const totalAmarela =
-                atuais.amarela.reduce(
-                    (soma, valor) =>
-                        soma + Number(valor || 0),
-                    0
-                );
+            const totalVermelha = atuais.vermelha.reduce(
+                (soma, valor) => soma + Number(valor || 0),
+                0
+            );
 
-            const totalVermelha =
-                atuais.vermelha.reduce(
-                    (soma, valor) =>
-                        soma + Number(valor || 0),
-                    0
-                );
-
-            const totalNd =
-                atuais.nd.reduce(
-                    (soma, valor) =>
-                        soma + Number(valor || 0),
-                    0
-                );
+            const totalNd = atuais.nd.reduce(
+                (soma, valor) => soma + Number(valor || 0),
+                0
+            );
 
             const totalGeral =
                 totalAmarela +
                 totalVermelha +
                 totalNd;
 
+            const totalBase = valorBase.reduce(
+                (soma, valor) => soma + Number(valor || 0),
+                0
+            );
+
+            const melhoriaGeral =
+                calcularPercentualMelhoria(
+                    totalBase,
+                    totalGeral
+                );
 
             const elTotalAmarela =
                 document.getElementById('totalAmarela');
@@ -1529,31 +1711,34 @@
             const elTotalGeral =
                 document.getElementById('totalGeral');
 
+            const elMelhoriaGeral =
+                document.getElementById('melhoriaGeral');
 
             if (elTotalAmarela) {
-                elTotalAmarela.textContent =
-                    totalAmarela;
+                elTotalAmarela.textContent = totalAmarela;
             }
 
             if (elTotalVermelha) {
-                elTotalVermelha.textContent =
-                    totalVermelha;
+                elTotalVermelha.textContent = totalVermelha;
             }
 
             if (elTotalNd) {
-                elTotalNd.textContent =
-                    totalNd;
+                elTotalNd.textContent = totalNd;
             }
 
             if (elTotalGeral) {
-                elTotalGeral.textContent =
-                    totalGeral;
+                elTotalGeral.textContent = totalGeral;
             }
 
+            if (elMelhoriaGeral) {
+                elMelhoriaGeral.textContent =
+                    formatarPercentual(melhoriaGeral);
 
-            // =========================================
-            // TABELA DETALHAMENTO POR LINHA
-            // =========================================
+                aplicarClasseMelhoria(
+                    elMelhoriaGeral,
+                    melhoriaGeral
+                );
+            }
 
             document
                 .querySelectorAll(
@@ -1573,12 +1758,10 @@
                                 item?.linha === linha
                         );
 
-
                     if (!registro) {
                         celula.textContent = '0';
                         return;
                     }
-
 
                     celula.textContent =
                         registro[campo] ?? 0;
@@ -1694,6 +1877,109 @@
         };
 
 
+
+        // =========================================================
+        // INFORMAÇÕES ADICIONAIS DAS VENCIDAS
+        // =========================================================
+
+        function obterInformacoesDaLinha(linha) {
+            return informacoesAdicionais.filter(
+                item => item.linha === linha
+            );
+        }
+
+        function renderizarInformacoesAdicionais(i) {
+            const lista = document.getElementById('informacoesAdicionaisLista');
+            const secao = document.getElementById('informacoesAdicionaisSection');
+
+            if (!lista || !secao || i < 0) {
+                return;
+            }
+
+            const linha = labels[i];
+            const itens = obterInformacoesDaLinha(linha);
+            lista.innerHTML = '';
+
+            const emModoAdmin = document.body.classList.contains('admin-mode');
+
+            if (!itens.length) {
+                if (!emModoAdmin) {
+                    secao.style.display = 'none';
+                    return;
+                }
+
+                secao.style.display = 'block';
+
+                const vazio = document.createElement('div');
+                vazio.className = 'info-adicional-vazio';
+                vazio.textContent = 'Nenhuma informação adicional cadastrada para esta linha.';
+                lista.appendChild(vazio);
+                return;
+            }
+
+            secao.style.display = 'block';
+
+            itens.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'info-adicional-item';
+
+                const titulo = document.createElement('div');
+                titulo.className = 'info-adicional-item-titulo';
+                titulo.textContent = item.titulo;
+
+                const valor = document.createElement('div');
+                valor.className = 'info-adicional-item-valor';
+                valor.textContent = Number(item.quantidade || 0);
+
+                card.appendChild(titulo);
+                card.appendChild(valor);
+
+                if (emModoAdmin) {
+                    const acoes = document.createElement('div');
+                    acoes.className = 'info-adicional-acoes';
+
+                    const editar = document.createElement('button');
+                    editar.type = 'button';
+                    editar.className = 'info-mini-btn';
+                    editar.title = 'Editar informação';
+                    editar.setAttribute('aria-label', 'Editar informação');
+                    editar.textContent = '✎';
+                    editar.addEventListener('click', () => abrirModalInformacao(item));
+
+                    const excluir = document.createElement('button');
+                    excluir.type = 'button';
+                    excluir.className = 'info-mini-btn delete';
+                    excluir.title = 'Excluir informação';
+                    excluir.setAttribute('aria-label', 'Excluir informação');
+                    excluir.textContent = '×';
+                    excluir.addEventListener('click', () => excluirInformacaoAdicional(item));
+
+                    acoes.appendChild(editar);
+                    acoes.appendChild(excluir);
+                    card.appendChild(acoes);
+                }
+
+                lista.appendChild(card);
+            });
+        }
+
+        function atualizarFraseResumo(i) {
+            const resumo = document.getElementById('resumoFraseLinha');
+            if (!resumo || i < 0) return;
+
+            const vencidas = Number(vencidasTotal[i] || 0);
+            const itens = obterInformacoesDaLinha(labels[i]);
+
+            resumo.textContent = `${vencidas} vencidas`;
+
+            itens.forEach(item => {
+                resumo.appendChild(document.createTextNode(' • '));
+                const forte = document.createElement('strong');
+                forte.textContent = `${Number(item.quantidade || 0)} ${item.titulo}`;
+                resumo.appendChild(forte);
+            });
+        }
+
         // =========================================================
         // ATUALIZAR PAINEL DE VENCIMENTO
         // =========================================================
@@ -1701,6 +1987,8 @@
         function atualizarVencimento(i) {
 
             if (i === indiceSelecionado) {
+                renderizarInformacoesAdicionais(i);
+                atualizarFraseResumo(i);
                 return;
             }
 
@@ -1710,280 +1998,66 @@
                 chart.draw();
             }
 
-
-            panel.classList.add(
-                'atualizando'
-            );
-
-            linhaSelecionada
-                .classList
-                .add('trocando');
-
-            clearTimeout(
-                timerAtualizacao
-            );
-
-
-            timerAtualizacao =
-                setTimeout(() => {
-
-
-                    // =============================================
-                    // VENCIDAS
-                    // =============================================
-
-                    const a =
-                        vencidas.amarela[i];
-
-                    const v =
-                        vencidas.vermelha[i];
-
-                    const n =
-                        vencidas.nd[i];
-
-
-                    linhaSelecionada.textContent =
-                        labels[i];
-
-
-                    document
-                        .getElementById(
-                            'totalVencidas'
-                        )
-                        .textContent =
-                        a + v + n;
-
-
-                    document
-                        .getElementById(
-                            'amarelaVencida'
-                        )
-                        .textContent = a;
-
-
-                    document
-                        .getElementById(
-                            'vermelhaVencida'
-                        )
-                        .textContent = v;
-
-
-                    document
-                        .getElementById(
-                            'ndVencida'
-                        )
-                        .textContent = n;
-
-
-                    // =============================================
-                    // STATUS OPERACIONAL
-                    // =============================================
-
-                    const cardProgramado =
-                        document.getElementById(
-                            'cardProgramado'
-                        );
-
-                    const cardMaterialAndamento =
-                        document.getElementById(
-                            'cardMaterialAndamento'
-                        );
-
-                    const programadoLabel =
-                        document.getElementById(
-                            'programadoLabel'
-                        );
-
-                    const programadoValor =
-                        document.getElementById(
-                            'programado'
-                        );
-
-                    const editarProgramado =
-                        document.getElementById(
-                            'editarProgramado'
-                        );
-
-
-                    // =============================================
-                    // PROGRAMADO - TODAS AS LINHAS
-                    // =============================================
-
-                    programadoLabel.textContent =
-                        'Programado';
-
-                    programadoValor.textContent =
-                        programado[i] ?? 0;
-
-
-                    // No admin, o lápis sempre edita Programado
-                    if (editarProgramado) {
-
-                        editarProgramado.dataset.field =
-                            'programado';
-
-                        editarProgramado.dataset.label =
-                            'Programado';
-                    }
-
-
-                    // =============================================
-                    // LINHA 4 = SOMENTE PROGRAMADO
-                    // =============================================
-
-                    if (i === 3) {
-
-                        // Esconde Material em Andamento
-                        if (cardMaterialAndamento) {
-
-                            cardMaterialAndamento
-                                .style
-                                .display = 'none';
-                        }
-
-
-                        // Programado ocupa toda a largura
-                        if (cardProgramado) {
-
-                            cardProgramado
-                                .style
-                                .gridColumn = '1 / -1';
-                        }
-
-                    } else {
-
-                        // =========================================
-                        // TODAS AS OUTRAS LINHAS
-                        // =========================================
-
-                        if (cardMaterialAndamento) {
-
-                            cardMaterialAndamento
-                                .style
-                                .display = 'flex';
-                        }
-
-
-                        if (cardProgramado) {
-
-                            cardProgramado
-                                .style
-                                .gridColumn = 'auto';
-                        }
-
-
-                        const materialAndamentoValor =
-                            document.getElementById(
-                                'materialAndamento'
-                            );
-
-
-                        if (materialAndamentoValor) {
-
-                            materialAndamentoValor.textContent =
-                                materialAndamento[i] ?? 0;
-                        }
-                    }
-
-                    // =============================================
-                    // DIAS VENCIDOS
-                    // =============================================
-
-                    document
-                        .getElementById(
-                            'diasAmarela'
-                        )
-                        .textContent =
-                        a > 0
-                            ? diasPorCategoria.amarela[i]
-                            : 'Sem vencidas';
-
-
-                    document
-                        .getElementById(
-                            'diasVermelha'
-                        )
-                        .textContent =
-                        v > 0
-                            ? diasPorCategoria.vermelha[i]
-                            : 'Sem vencidas';
-
-
-                    document
-                        .getElementById(
-                            'diasNd'
-                        )
-                        .textContent =
-                        n > 0
-                            ? diasPorCategoria.nd[i]
-                            : 'Sem vencidas';
-
-
-                    // =============================================
-                    // ESTILO DOS CARDS SEM VENCIDAS
-                    // =============================================
-
-                    document
-                        .getElementById(
-                            'cardAmarela'
-                        )
-                        .classList
-                        .toggle(
-                            'sem-vencidas',
-                            a === 0
-                        );
-
-
-                    document
-                        .getElementById(
-                            'cardVermelha'
-                        )
-                        .classList
-                        .toggle(
-                            'sem-vencidas',
-                            v === 0
-                        );
-
-
-                    document
-                        .getElementById(
-                            'cardNd'
-                        )
-                        .classList
-                        .toggle(
-                            'sem-vencidas',
-                            n === 0
-                        );
-
-
-                    // =============================================
-                    // ANIMAÇÃO
-                    // =============================================
-
-                    panel.classList.add(
-                        'aberto'
-                    );
-
-                    panel.classList.remove(
-                        'atualizando'
-                    );
-
-                    panel.classList.remove(
-                        'pulso'
-                    );
-
+            panel?.classList.add('atualizando');
+            linhaSelecionada?.classList.add('trocando');
+
+            clearTimeout(timerAtualizacao);
+
+            timerAtualizacao = setTimeout(() => {
+
+                const atual =
+                    Number(atuais.amarela[i] || 0) +
+                    Number(atuais.vermelha[i] || 0) +
+                    Number(atuais.nd[i] || 0);
+
+                const base = Number(valorBase[i] || 0);
+                const vencidas = Number(vencidasTotal[i] || 0);
+                const melhoria = calcularPercentualMelhoria(base, atual);
+
+                if (linhaSelecionada) {
+                    linhaSelecionada.textContent = labels[i];
+                }
+
+                const totalAtualLinha = document.getElementById('totalAtualLinha');
+                const melhoriaLinha = document.getElementById('melhoriaLinha');
+                const comparacaoBaseLinha = document.getElementById('comparacaoBaseLinha');
+                const vencidasTotalLinha = document.getElementById('vencidasTotalLinha');
+
+                if (totalAtualLinha) {
+                    totalAtualLinha.textContent = atual;
+                }
+
+                if (melhoriaLinha) {
+                    melhoriaLinha.textContent = formatarPercentual(melhoria);
+                    aplicarClasseMelhoria(melhoriaLinha, melhoria);
+                }
+
+                if (comparacaoBaseLinha) {
+                    comparacaoBaseLinha.textContent =
+                        base > 0
+                            ? `Base: ${base} → Atual: ${atual}`
+                            : 'Base não definida';
+                }
+
+                if (vencidasTotalLinha) {
+                    vencidasTotalLinha.textContent = vencidas;
+                }
+
+                renderizarInformacoesAdicionais(i);
+                atualizarFraseResumo(i);
+
+                panel?.classList.add('aberto');
+                panel?.classList.remove('atualizando');
+                panel?.classList.remove('pulso');
+
+                if (panel) {
                     void panel.offsetWidth;
+                }
 
-                    panel.classList.add(
-                        'pulso'
-                    );
+                panel?.classList.add('pulso');
+                linhaSelecionada?.classList.remove('trocando');
 
-                    linhaSelecionada
-                        .classList
-                        .remove('trocando');
-
-
-                }, 120);
+            }, 120);
         }
 
 
