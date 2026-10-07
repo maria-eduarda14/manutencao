@@ -1970,8 +1970,6 @@
             const vencidas = Number(vencidasTotal[i] || 0);
             const itens = obterInformacoesDaLinha(labels[i]);
 
-            resumo.textContent = `${vencidas} vencidas`;
-
             itens.forEach(item => {
                 resumo.appendChild(document.createTextNode(' • '));
                 const forte = document.createElement('strong');
