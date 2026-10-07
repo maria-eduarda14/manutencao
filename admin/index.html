@@ -1016,14 +1016,14 @@
 
         /* No admin, evita que o espaço reservado para o lápis
            desloque os títulos desses cards para a esquerda. */
-        body.admin-mode .total-vencidas > .label,
-        body.admin-mode .programado-item > .label,
-        body.admin-mode .andamento-item > .label {
+        body.admin-mode .total-vencidas>.label,
+        body.admin-mode .programado-item>.label,
+        body.admin-mode .andamento-item>.label {
             padding-left: 0;
             padding-right: 0;
         }
 
-    
+
         /* =========================================================
            NOVO RESUMO: MELHORIA + VENCIDAS
         ========================================================= */
@@ -1326,7 +1326,7 @@
             padding: 24px;
             border-radius: 12px;
             background: #fff;
-            box-shadow: 0 12px 34px rgba(0,0,0,.18);
+            box-shadow: 0 12px 34px rgba(0, 0, 0, .18);
         }
 
         .info-modal-box h3 {
@@ -1392,6 +1392,7 @@
         }
 
         @media(max-width:600px) {
+
             .resumo-linha-grid,
             .info-adicional-lista {
                 grid-template-columns: 1fr;
@@ -1406,7 +1407,6 @@
                 flex-direction: column;
             }
         }
-
     </style>
 </head>
 
@@ -1629,9 +1629,7 @@
                 </div>
 
                 <div class="resumo-item melhoria-item">
-                    <button type="button" class="edit-btn admin-only"
-                        data-field="valor_base"
-                        data-label="Valor base"
+                    <button type="button" class="edit-btn admin-only" data-field="valor_base" data-label="Valor base"
                         aria-label="Editar valor base">✎</button>
 
                     <span class="resumo-label">Melhoria desde o início</span>
@@ -1640,10 +1638,8 @@
                 </div>
 
                 <div class="resumo-item vencidas-item">
-                    <button type="button" class="edit-btn admin-only"
-                        data-field="vencidas_total"
-                        data-label="Total de vencidas"
-                        aria-label="Editar total de vencidas">✎</button>
+                    <button type="button" class="edit-btn admin-only" data-field="vencidas_total"
+                        data-label="Total de vencidas" aria-label="Editar total de vencidas">✎</button>
 
                     <span class="resumo-label">Vencidas</span>
                     <span id="vencidasTotalLinha" class="resumo-value">0</span>
@@ -1655,7 +1651,8 @@
                 <div class="info-adicional-header">
                     <div>
                         <div class="info-adicional-titulo">Informações das vencidas</div>
-                        <div class="info-adicional-subtitulo">Adicione somente os detalhes que fizerem sentido para esta linha.</div>
+                        <div class="info-adicional-subtitulo">Adicione somente os detalhes que fizerem sentido para esta
+                            linha.</div>
                     </div>
 
                     <button id="btnAdicionarInformacao" type="button" class="add-info-btn admin-only">
@@ -1664,10 +1661,6 @@
                 </div>
 
                 <div id="informacoesAdicionaisLista" class="info-adicional-lista"></div>
-            </div>
-
-            <div id="resumoFraseLinha" class="resumo-frase">
-                Selecione uma linha no gráfico para visualizar o resumo.
             </div>
         </section>
 
@@ -1678,7 +1671,7 @@
                 <h2>Detalhamento por linha</h2>
 
                 <span class="admin-hint admin-only">
-                    Clique no lápis para alterar um valor
+                    Clique na linha para alterar um valor
                 </span>
 
             </div>
@@ -2526,21 +2519,6 @@
             });
         }
 
-        function atualizarFraseResumo(i) {
-            const resumo = document.getElementById('resumoFraseLinha');
-            if (!resumo || i < 0) return;
-
-            const vencidas = Number(vencidasTotal[i] || 0);
-            const itens = obterInformacoesDaLinha(labels[i]);
-
-            itens.forEach(item => {
-                resumo.appendChild(document.createTextNode(' • '));
-                const forte = document.createElement('strong');
-                forte.textContent = `${Number(item.quantidade || 0)} ${item.titulo}`;
-                resumo.appendChild(forte);
-            });
-        }
-
         // =========================================================
         // ATUALIZAR PAINEL DE VENCIMENTO
         // =========================================================
@@ -2549,7 +2527,6 @@
 
             if (i === indiceSelecionado) {
                 renderizarInformacoesAdicionais(i);
-                atualizarFraseResumo(i);
                 return;
             }
 
@@ -2605,7 +2582,6 @@
                 }
 
                 renderizarInformacoesAdicionais(i);
-                atualizarFraseResumo(i);
 
                 panel?.classList.add('aberto');
                 panel?.classList.remove('atualizando');
