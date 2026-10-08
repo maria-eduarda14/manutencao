@@ -1295,20 +1295,20 @@
                 </div>
 
                 <div class="resumo-item vencidas-item">
-                    <button type="button" class="edit-btn admin-only" data-field="vencidas_total"
-                        data-label="Total de vencidas" aria-label="Editar total de vencidas">✎</button>
+                    <button id="editarResumoPrincipal" type="button" class="edit-btn admin-only"
+                        aria-label="Editar indicador principal" title="Editar indicador principal">✎</button>
 
-                    <span class="resumo-label">Vencidas</span>
-                    <span id="vencidasTotalLinha" class="resumo-value">0</span>
-                    <span class="resumo-sub">total da linha</span>
+                    <span id="resumoTituloLinha" class="resumo-label">Vencidas</span>
+                    <span id="resumoValorLinha" class="resumo-value">0</span>
+                    <span class="resumo-sub">indicador da linha</span>
                 </div>
             </div>
 
             <div id="informacoesAdicionaisSection" class="info-adicional-section">
                 <div class="info-adicional-header">
                     <div>
-                        <div class="info-adicional-titulo">Informações das vencidas</div>
-                        <div class="info-adicional-subtitulo">Adicione somente os detalhes que fizerem sentido para esta
+                        <div class="info-adicional-titulo">Informações adicionais</div>
+                        <div class="info-adicional-subtitulo">Adicione detalhes complementares que fizerem sentido para esta
                             linha.</div>
                     </div>
 
@@ -1540,7 +1540,8 @@
         };
 
         let valorBase = [];
-        let vencidasTotal = [];
+        let resumoTitulo = [];
+        let resumoValor = [];
         let informacoesAdicionais = [];
 
         let dadosPainel = [];
@@ -1576,7 +1577,8 @@
                     vermelha,
                     nd,
                     valor_base,
-                    vencidas_total
+                    resumo_titulo,
+                    resumo_valor
                 `);
 
             if (error) {
@@ -1600,7 +1602,8 @@
             atuais.nd = dadosPainel.map(item => item?.nd ?? 0);
 
             valorBase = dadosPainel.map(item => item?.valor_base ?? 0);
-            vencidasTotal = dadosPainel.map(item => item?.vencidas_total ?? 0);
+            resumoTitulo = dadosPainel.map(item => item?.resumo_titulo?.trim() || 'Vencidas');
+            resumoValor = dadosPainel.map(item => Number(item?.resumo_valor ?? 0));
 
             const { data: infosData, error: infosError } = await supabaseClient
                 .from('painel_notas_info')
@@ -1986,7 +1989,8 @@
                     Number(atuais.nd[i] || 0);
 
                 const base = Number(valorBase[i] || 0);
-                const vencidas = Number(vencidasTotal[i] || 0);
+                const tituloResumo = resumoTitulo[i] || 'Vencidas';
+                const valorResumo = Number(resumoValor[i] || 0);
                 const melhoria = calcularPercentualMelhoria(base, atual);
 
                 if (linhaSelecionada) {
@@ -1996,7 +2000,8 @@
                 const totalAtualLinha = document.getElementById('totalAtualLinha');
                 const melhoriaLinha = document.getElementById('melhoriaLinha');
                 const comparacaoBaseLinha = document.getElementById('comparacaoBaseLinha');
-                const vencidasTotalLinha = document.getElementById('vencidasTotalLinha');
+                const resumoTituloLinha = document.getElementById('resumoTituloLinha');
+                const resumoValorLinha = document.getElementById('resumoValorLinha');
 
                 if (totalAtualLinha) {
                     totalAtualLinha.textContent = atual;
@@ -2014,8 +2019,12 @@
                             : 'Base não definida';
                 }
 
-                if (vencidasTotalLinha) {
-                    vencidasTotalLinha.textContent = vencidas;
+                if (resumoTituloLinha) {
+                    resumoTituloLinha.textContent = tituloResumo;
+                }
+
+                if (resumoValorLinha) {
+                    resumoValorLinha.textContent = valorResumo;
                 }
 
                 renderizarInformacoesAdicionais(i);
