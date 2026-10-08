@@ -1128,15 +1128,16 @@
         .card-action-btn {
             width: 29px;
             height: 29px;
+            padding: 0;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 0;
             border: 1px solid #dce2e7;
             border-radius: 7px;
             background: #fff;
             color: #66727d;
             font-size: 16px;
+            line-height: 1;
             cursor: pointer;
         }
 
@@ -1171,8 +1172,8 @@
         }
 
         .restaurar-card-btn:hover {
-            background: #f5faff;
             color: #2479ad;
+            background: #f5faff;
             border-color: #9bc7e5;
         }
 
@@ -1553,12 +1554,11 @@
 
 
 
-
     <!-- Modal do card de melhoria -->
     <div id="melhoriaModal" class="info-modal oculto" aria-hidden="true">
         <div class="info-modal-box">
             <h3>Editar card de melhoria</h3>
-            <p>Altere o título exibido e o valor base usado no cálculo do percentual.</p>
+            <p>Você pode alterar o título do card e o valor base usado para calcular o percentual.</p>
 
             <label for="melhoriaTituloInput">Título</label>
             <input id="melhoriaTituloInput" type="text" maxlength="80"
@@ -1676,7 +1676,8 @@
                 <div class="card-title">Total Geral</div>
                 <div id="totalGeral" class="card-value">0</div>
             </div>
-</section>
+
+        </section>
 
 
         <!-- =========================================
@@ -2206,11 +2207,8 @@
                     vermelha,
                     nd,
                     valor_base,
-                    melhoria_titulo,
-                    melhoria_visivel,
                     resumo_titulo,
-                    resumo_valor,
-                    resumo_visivel
+                    resumo_valor
                 `);
 
             if (error) {
@@ -2234,11 +2232,41 @@
             atuais.nd = dadosPainel.map(item => item?.nd ?? 0);
 
             valorBase = dadosPainel.map(item => item?.valor_base ?? 0);
-            melhoriaTitulo = dadosPainel.map(item => item?.melhoria_titulo?.trim() || 'Melhoria desde o início');
-            melhoriaVisivel = dadosPainel.map(item => item?.melhoria_visivel !== false);
             resumoTitulo = dadosPainel.map(item => item?.resumo_titulo?.trim() || 'Vencidas');
             resumoValor = dadosPainel.map(item => Number(item?.resumo_valor ?? 0));
-            resumoVisivel = dadosPainel.map(item => item?.resumo_visivel !== false);
+
+            // Configurações opcionais dos cards.
+            // Esta consulta é separada de propósito: se houver qualquer
+            // problema com esses campos, o gráfico e a tabela continuam.
+            melhoriaTitulo = labels.map(() => 'Melhoria desde o início');
+            melhoriaVisivel = labels.map(() => true);
+            resumoVisivel = labels.map(() => true);
+
+            const { data: configCardsData, error: configCardsError } = await supabaseClient
+                .from('painel_notas')
+                .select('linha, melhoria_titulo, melhoria_visivel, resumo_visivel');
+
+            if (configCardsError) {
+                console.warn(
+                    'Não foi possível carregar as configurações opcionais dos cards. Usando padrões:',
+                    configCardsError
+                );
+            } else {
+                labels.forEach((linha, indice) => {
+                    const config = configCardsData?.find(item => item.linha === linha);
+
+                    if (!config) return;
+
+                    melhoriaTitulo[indice] =
+                        config.melhoria_titulo?.trim() || 'Melhoria desde o início';
+
+                    melhoriaVisivel[indice] =
+                        config.melhoria_visivel !== false;
+
+                    resumoVisivel[indice] =
+                        config.resumo_visivel !== false;
+                });
+            }
 
             const { data: infosData, error: infosError } = await supabaseClient
                 .from('painel_notas_info')
@@ -2318,7 +2346,19 @@
                 totalAmarela +
                 totalVermelha +
                 totalNd;
-const elTotalAmarela =
+
+            const totalBase = valorBase.reduce(
+                (soma, valor) => soma + Number(valor || 0),
+                0
+            );
+
+            const melhoriaGeral =
+                calcularPercentualMelhoria(
+                    totalBase,
+                    totalGeral
+                );
+
+            const elTotalAmarela =
                 document.getElementById('totalAmarela');
 
             const elTotalVermelha =
@@ -2329,7 +2369,11 @@ const elTotalAmarela =
 
             const elTotalGeral =
                 document.getElementById('totalGeral');
-if (elTotalAmarela) {
+
+            const elMelhoriaGeral =
+                document.getElementById('melhoriaGeral');
+
+            if (elTotalAmarela) {
                 elTotalAmarela.textContent = totalAmarela;
             }
 
@@ -2622,6 +2666,7 @@ if (elTotalAmarela) {
         function atualizarVencimento(i) {
 
             if (i === indiceSelecionado) {
+                renderizarCardsOcultos(i);
                 renderizarInformacoesAdicionais(i);
                 return;
             }
@@ -2701,7 +2746,7 @@ if (elTotalAmarela) {
                     resumoValorLinha.textContent = valorResumo;
                 }
 
-                renderizarCardsOcultos?.(i);
+                renderizarCardsOcultos(i);
                 renderizarInformacoesAdicionais(i);
 
                 panel?.classList.add('aberto');
@@ -3346,11 +3391,16 @@ if (elTotalAmarela) {
 
 
         // =========================================================
-        // CARD DE MELHORIA DINÂMICO / REMOVÍVEL
+        // CARDS DINÂMICOS: MELHORIA / INDICADOR PRINCIPAL
         // =========================================================
 
         function abrirModalMelhoria() {
-            if (!usuarioAdmin || indiceSelecionado < 0) {
+            if (!usuarioAdmin) {
+                alert('Faça login como administrador.');
+                return;
+            }
+
+            if (indiceSelecionado < 0) {
                 alert('Selecione uma linha no gráfico primeiro.');
                 return;
             }
@@ -3360,7 +3410,8 @@ if (elTotalAmarela) {
             const modal = document.getElementById('melhoriaModal');
 
             if (tituloInput) {
-                tituloInput.value = melhoriaTitulo[indiceSelecionado] || 'Melhoria desde o início';
+                tituloInput.value =
+                    melhoriaTitulo[indiceSelecionado] || 'Melhoria desde o início';
             }
 
             if (baseInput) {
@@ -3379,10 +3430,16 @@ if (elTotalAmarela) {
         }
 
         async function salvarMelhoria() {
-            if (!usuarioAdmin || indiceSelecionado < 0) return;
+            if (!usuarioAdmin || indiceSelecionado < 0) {
+                return;
+            }
 
-            const titulo = document.getElementById('melhoriaTituloInput')?.value.trim();
-            const baseDigitada = document.getElementById('melhoriaBaseInput')?.value;
+            const titulo =
+                document.getElementById('melhoriaTituloInput')?.value.trim();
+
+            const baseDigitada =
+                document.getElementById('melhoriaBaseInput')?.value;
+
             const base = Number(baseDigitada);
 
             if (!titulo) {
@@ -3405,7 +3462,7 @@ if (elTotalAmarela) {
                 .eq('linha', labels[indiceSelecionado]);
 
             if (error) {
-                console.error('Erro ao salvar card de melhoria:', error);
+                console.error('Erro ao salvar o card de melhoria:', error);
                 alert('Não foi possível salvar o card de melhoria.');
                 return;
             }
@@ -3415,7 +3472,9 @@ if (elTotalAmarela) {
         }
 
         async function alterarVisibilidadeCard(campo, visivel) {
-            if (!usuarioAdmin || indiceSelecionado < 0) return;
+            if (!usuarioAdmin || indiceSelecionado < 0) {
+                return;
+            }
 
             const { error } = await supabaseClient
                 .from('painel_notas')
@@ -3423,7 +3482,7 @@ if (elTotalAmarela) {
                 .eq('linha', labels[indiceSelecionado]);
 
             if (error) {
-                console.error('Erro ao alterar visibilidade do card:', error);
+                console.error('Erro ao alterar a visibilidade do card:', error);
                 alert('Não foi possível alterar a visibilidade do card.');
                 return;
             }
@@ -3432,44 +3491,64 @@ if (elTotalAmarela) {
         }
 
         async function removerMelhoria() {
-            if (!confirm('Remover este card desta linha? Você poderá restaurá-lo depois.')) return;
+            const confirmou = confirm(
+                'Remover este card desta linha? Você poderá restaurá-lo depois.'
+            );
+
+            if (!confirmou) return;
+
             await alterarVisibilidadeCard('melhoria_visivel', false);
         }
 
         async function removerResumoPrincipal() {
-            if (!confirm('Remover este card desta linha? Você poderá restaurá-lo depois.')) return;
+            const confirmou = confirm(
+                'Remover este card desta linha? Você poderá restaurá-lo depois.'
+            );
+
+            if (!confirmou) return;
+
             await alterarVisibilidadeCard('resumo_visivel', false);
         }
 
         function renderizarCardsOcultos(i) {
             const area = document.getElementById('cardsOcultosArea');
-            if (!area) return;
+
+            if (!area || i < 0) {
+                return;
+            }
 
             area.innerHTML = '';
 
             if (melhoriaVisivel[i] === false) {
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = 'restaurar-card-btn';
-                btn.textContent = '+ Restaurar card de melhoria';
-                btn.addEventListener('click', () =>
-                    alterarVisibilidadeCard('melhoria_visivel', true)
-                );
-                area.appendChild(btn);
+                const botao = document.createElement('button');
+                botao.type = 'button';
+                botao.className = 'restaurar-card-btn';
+                botao.textContent = '+ Restaurar card de melhoria';
+
+                botao.addEventListener('click', () => {
+                    alterarVisibilidadeCard('melhoria_visivel', true);
+                });
+
+                area.appendChild(botao);
             }
 
             if (resumoVisivel[i] === false) {
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = 'restaurar-card-btn';
-                btn.textContent = '+ Restaurar indicador';
-                btn.addEventListener('click', () =>
-                    alterarVisibilidadeCard('resumo_visivel', true)
-                );
-                area.appendChild(btn);
+                const botao = document.createElement('button');
+                botao.type = 'button';
+                botao.className = 'restaurar-card-btn';
+                botao.textContent = '+ Restaurar indicador';
+
+                botao.addEventListener('click', () => {
+                    alterarVisibilidadeCard('resumo_visivel', true);
+                });
+
+                area.appendChild(botao);
             }
 
-            area.style.display = area.children.length ? 'flex' : 'none';
+            area.style.display =
+                area.children.length > 0
+                    ? 'flex'
+                    : 'none';
         }
 
         function configurarCardsDinamicos() {
@@ -3506,7 +3585,9 @@ if (elTotalAmarela) {
 
             document.getElementById('melhoriaBaseInput')
                 ?.addEventListener('keydown', event => {
-                    if (event.key === 'Enter') salvarMelhoria();
+                    if (event.key === 'Enter') {
+                        salvarMelhoria();
+                    }
                 });
         }
 
