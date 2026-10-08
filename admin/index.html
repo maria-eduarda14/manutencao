@@ -1497,6 +1497,26 @@
     </div>
 
 
+
+    <!-- Modal do indicador principal da linha -->
+    <div id="resumoPrincipalModal" class="info-modal oculto" aria-hidden="true">
+        <div class="info-modal-box">
+            <h3>Editar indicador principal</h3>
+            <p>Altere o título e o valor do terceiro card da linha selecionada.</p>
+
+            <label for="resumoTituloInput">Título</label>
+            <input id="resumoTituloInput" type="text" maxlength="80" placeholder="Ex.: Vencidas ou Preventiva">
+
+            <label for="resumoValorInput">Valor</label>
+            <input id="resumoValorInput" type="number" min="0" step="1" placeholder="0">
+
+            <div class="info-modal-actions">
+                <button id="btnCancelarResumoPrincipal" class="info-cancelar-btn" type="button">Cancelar</button>
+                <button id="btnSalvarResumoPrincipal" class="info-salvar-btn" type="button">Salvar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal de informação adicional -->
     <div id="infoModal" class="info-modal oculto" aria-hidden="true">
         <div class="info-modal-box">
@@ -1638,20 +1658,20 @@
                 </div>
 
                 <div class="resumo-item vencidas-item">
-                    <button type="button" class="edit-btn admin-only" data-field="vencidas_total"
-                        data-label="Total de vencidas" aria-label="Editar total de vencidas">✎</button>
+                    <button id="editarResumoPrincipal" type="button" class="edit-btn admin-only"
+                        aria-label="Editar indicador principal" title="Editar indicador principal">✎</button>
 
-                    <span class="resumo-label">Vencidas</span>
-                    <span id="vencidasTotalLinha" class="resumo-value">0</span>
-                    <span class="resumo-sub">total da linha</span>
+                    <span id="resumoTituloLinha" class="resumo-label">Vencidas</span>
+                    <span id="resumoValorLinha" class="resumo-value">0</span>
+                    <span class="resumo-sub">indicador da linha</span>
                 </div>
             </div>
 
             <div id="informacoesAdicionaisSection" class="info-adicional-section">
                 <div class="info-adicional-header">
                     <div>
-                        <div class="info-adicional-titulo">Informações das vencidas</div>
-                        <div class="info-adicional-subtitulo">Adicione somente os detalhes que fizerem sentido para esta
+                        <div class="info-adicional-titulo">Informações adicionais</div>
+                        <div class="info-adicional-subtitulo">Adicione detalhes complementares que fizerem sentido para esta
                             linha.</div>
                     </div>
 
@@ -2058,7 +2078,8 @@
 
 
         let valorBase = [];
-        let vencidasTotal = [];
+        let resumoTitulo = [];
+        let resumoValor = [];
         let informacoesAdicionais = [];
 
         let dadosPainel = [];
@@ -2102,7 +2123,8 @@
                     vermelha,
                     nd,
                     valor_base,
-                    vencidas_total
+                    resumo_titulo,
+                    resumo_valor
                 `);
 
             if (error) {
@@ -2126,7 +2148,8 @@
             atuais.nd = dadosPainel.map(item => item?.nd ?? 0);
 
             valorBase = dadosPainel.map(item => item?.valor_base ?? 0);
-            vencidasTotal = dadosPainel.map(item => item?.vencidas_total ?? 0);
+            resumoTitulo = dadosPainel.map(item => item?.resumo_titulo?.trim() || 'Vencidas');
+            resumoValor = dadosPainel.map(item => Number(item?.resumo_valor ?? 0));
 
             const { data: infosData, error: infosError } = await supabaseClient
                 .from('painel_notas_info')
@@ -2549,7 +2572,8 @@
                     Number(atuais.nd[i] || 0);
 
                 const base = Number(valorBase[i] || 0);
-                const vencidas = Number(vencidasTotal[i] || 0);
+                const tituloResumo = resumoTitulo[i] || 'Vencidas';
+                const valorResumo = Number(resumoValor[i] || 0);
                 const melhoria = calcularPercentualMelhoria(base, atual);
 
                 if (linhaSelecionada) {
@@ -2559,7 +2583,8 @@
                 const totalAtualLinha = document.getElementById('totalAtualLinha');
                 const melhoriaLinha = document.getElementById('melhoriaLinha');
                 const comparacaoBaseLinha = document.getElementById('comparacaoBaseLinha');
-                const vencidasTotalLinha = document.getElementById('vencidasTotalLinha');
+                const resumoTituloLinha = document.getElementById('resumoTituloLinha');
+                const resumoValorLinha = document.getElementById('resumoValorLinha');
 
                 if (totalAtualLinha) {
                     totalAtualLinha.textContent = atual;
@@ -2577,8 +2602,12 @@
                             : 'Base não definida';
                 }
 
-                if (vencidasTotalLinha) {
-                    vencidasTotalLinha.textContent = vencidas;
+                if (resumoTituloLinha) {
+                    resumoTituloLinha.textContent = tituloResumo;
+                }
+
+                if (resumoValorLinha) {
+                    resumoValorLinha.textContent = valorResumo;
                 }
 
                 renderizarInformacoesAdicionais(i);
@@ -2899,8 +2928,7 @@
                 'amarela',
                 'vermelha',
                 'nd',
-                'valor_base',
-                'vencidas_total'
+                'valor_base'
             ];
 
 
@@ -3223,6 +3251,113 @@
 
 
 
+
+        // =========================================================
+        // INDICADOR PRINCIPAL DINÂMICO
+        // =========================================================
+
+        function abrirModalResumoPrincipal() {
+            if (!usuarioAdmin) {
+                alert('Faça login como administrador.');
+                return;
+            }
+
+            if (indiceSelecionado < 0) {
+                alert('Selecione uma linha no gráfico primeiro.');
+                return;
+            }
+
+            const tituloInput = document.getElementById('resumoTituloInput');
+            const valorInput = document.getElementById('resumoValorInput');
+            const modal = document.getElementById('resumoPrincipalModal');
+
+            if (tituloInput) {
+                tituloInput.value = resumoTitulo[indiceSelecionado] || 'Vencidas';
+            }
+
+            if (valorInput) {
+                valorInput.value = Number(resumoValor[indiceSelecionado] || 0);
+            }
+
+            modal?.classList.remove('oculto');
+            modal?.setAttribute('aria-hidden', 'false');
+
+            setTimeout(() => tituloInput?.focus(), 0);
+        }
+
+        function fecharModalResumoPrincipal() {
+            const modal = document.getElementById('resumoPrincipalModal');
+            modal?.classList.add('oculto');
+            modal?.setAttribute('aria-hidden', 'true');
+        }
+
+        async function salvarResumoPrincipal() {
+            if (!usuarioAdmin || indiceSelecionado < 0) {
+                return;
+            }
+
+            const titulo = document.getElementById('resumoTituloInput')?.value.trim();
+            const valorDigitado = document.getElementById('resumoValorInput')?.value;
+            const valor = Number(valorDigitado);
+
+            if (!titulo) {
+                alert('Digite um título para o indicador.');
+                return;
+            }
+
+            if (!Number.isInteger(valor) || valor < 0) {
+                alert('Digite um valor inteiro maior ou igual a zero.');
+                return;
+            }
+
+            const linha = labels[indiceSelecionado];
+
+            const { error } = await supabaseClient
+                .from('painel_notas')
+                .update({
+                    resumo_titulo: titulo,
+                    resumo_valor: valor
+                })
+                .eq('linha', linha);
+
+            if (error) {
+                console.error('Erro ao salvar indicador principal:', error);
+                alert('Não foi possível salvar o indicador.');
+                return;
+            }
+
+            fecharModalResumoPrincipal();
+            await recarregarPainel();
+        }
+
+        function configurarResumoPrincipal() {
+            document.getElementById('editarResumoPrincipal')
+                ?.addEventListener('click', event => {
+                    event.stopPropagation();
+                    abrirModalResumoPrincipal();
+                });
+
+            document.getElementById('btnCancelarResumoPrincipal')
+                ?.addEventListener('click', fecharModalResumoPrincipal);
+
+            document.getElementById('btnSalvarResumoPrincipal')
+                ?.addEventListener('click', salvarResumoPrincipal);
+
+            document.getElementById('resumoPrincipalModal')
+                ?.addEventListener('click', event => {
+                    if (event.target?.id === 'resumoPrincipalModal') {
+                        fecharModalResumoPrincipal();
+                    }
+                });
+
+            document.getElementById('resumoValorInput')
+                ?.addEventListener('keydown', event => {
+                    if (event.key === 'Enter') {
+                        salvarResumoPrincipal();
+                    }
+                });
+        }
+
         // =========================================================
         // CRUD DAS INFORMAÇÕES ADICIONAIS
         // =========================================================
@@ -3520,6 +3655,9 @@
 
 
             configurarEdicaoTabela();
+
+
+            configurarResumoPrincipal();
 
 
             configurarInformacoesAdicionais();
