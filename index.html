@@ -153,6 +153,41 @@
             color: #222
         }
 
+        .vencimento-title-wrap,
+        .info-title-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .title-edit-btn {
+            width: 28px;
+            height: 28px;
+            flex: 0 0 auto;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            border: 1px solid #dce2e7;
+            border-radius: 7px;
+            background: #fff;
+            color: #66727d;
+            font-size: 15px;
+            line-height: 1;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, .05);
+        }
+
+        .title-edit-btn:hover {
+            color: #2980b9;
+            background: #f5faff;
+            border-color: #bcdcf3;
+        }
+
+        body.admin-mode .info-adicional-subtitulo.admin-only {
+            display: block;
+        }
+
         .linha-selecionada {
             display: inline-flex;
             align-items: center;
@@ -1326,7 +1361,12 @@
         ========================================== -->
         <section id="vencimentoPanel" class="vencimento-panel">
             <div class="vencimento-header">
-                <h3>Evolução e situação da linha</h3>
+                <div class="vencimento-title-wrap">
+                    <h3 id="painelTituloLinha">Evolução e situação da linha</h3>
+                    <button id="editarPainelTitulo" type="button"
+                        class="title-edit-btn admin-only"
+                        aria-label="Editar título do painel" title="Editar título">✎</button>
+                </div>
                 <span id="linhaSelecionada" class="linha-selecionada">—</span>
             </div>
             <div class="resumo-linha-grid">
@@ -1368,9 +1408,16 @@
             <div id="informacoesAdicionaisSection" class="info-adicional-section">
                 <div class="info-adicional-header">
                     <div>
-                        <div class="info-adicional-titulo">Informações adicionais</div>
-                        <div class="info-adicional-subtitulo">Adicione detalhes complementares que fizerem sentido para esta
-                            linha.</div>
+                        <div class="info-title-row">
+                            <div id="informacoesTituloLinha" class="info-adicional-titulo">Informações adicionais</div>
+                            <button id="editarInformacoesTitulo" type="button"
+                                class="title-edit-btn admin-only"
+                                aria-label="Editar título das informações adicionais" title="Editar título">✎</button>
+                        </div>
+                        <div class="info-adicional-subtitulo admin-only">
+                            Use este espaço para registrar detalhes específicos desta linha, como programações,
+                            reavaliações ou outros status relevantes.
+                        </div>
                     </div>
 
                     <button id="btnAdicionarInformacao" type="button" class="add-info-btn admin-only">
@@ -1606,6 +1653,8 @@
         let resumoTitulo = [];
         let resumoValor = [];
         let resumoVisivel = [];
+        let painelTitulo = [];
+        let informacoesTitulo = [];
         let informacoesAdicionais = [];
 
         let dadosPainel = [];
@@ -1675,10 +1724,12 @@
             melhoriaTitulo = labels.map(() => 'Melhoria desde o início');
             melhoriaVisivel = labels.map(() => true);
             resumoVisivel = labels.map(() => true);
+            painelTitulo = labels.map(() => 'Evolução e situação da linha');
+            informacoesTitulo = labels.map(() => 'Informações adicionais');
 
             const { data: configCardsData, error: configCardsError } = await supabaseClient
                 .from('painel_notas')
-                .select('linha, melhoria_titulo, melhoria_visivel, resumo_visivel');
+                .select('linha, melhoria_titulo, melhoria_visivel, resumo_visivel, painel_titulo, informacoes_titulo');
 
             if (configCardsError) {
                 console.warn(
@@ -1699,6 +1750,12 @@
 
                     resumoVisivel[indice] =
                         config.resumo_visivel !== false;
+
+                    painelTitulo[indice] =
+                        config.painel_titulo?.trim() || 'Evolução e situação da linha';
+
+                    informacoesTitulo[indice] =
+                        config.informacoes_titulo?.trim() || 'Informações adicionais';
                 });
             }
 
@@ -2093,6 +2150,8 @@
                 const base = Number(valorBase[i] || 0);
                 const tituloMelhoria = melhoriaTitulo[i] || 'Melhoria desde o início';
                 const exibirMelhoria = melhoriaVisivel[i] !== false;
+                const tituloPainel = painelTitulo[i] || 'Evolução e situação da linha';
+                const tituloInformacoes = informacoesTitulo[i] || 'Informações adicionais';
                 const tituloResumo = resumoTitulo[i] || 'Vencidas';
                 const valorResumo = Number(resumoValor[i] || 0);
                 const exibirResumo = resumoVisivel[i] !== false;
@@ -2102,6 +2161,8 @@
                     linhaSelecionada.textContent = labels[i];
                 }
 
+                const painelTituloLinha = document.getElementById('painelTituloLinha');
+                const informacoesTituloLinha = document.getElementById('informacoesTituloLinha');
                 const totalAtualLinha = document.getElementById('totalAtualLinha');
                 const cardMelhoriaLinha = document.getElementById('cardMelhoriaLinha');
                 const melhoriaTituloLinha = document.getElementById('melhoriaTituloLinha');
@@ -2110,6 +2171,14 @@
                 const cardResumoPrincipal = document.getElementById('cardResumoPrincipal');
                 const resumoTituloLinha = document.getElementById('resumoTituloLinha');
                 const resumoValorLinha = document.getElementById('resumoValorLinha');
+
+                if (painelTituloLinha) {
+                    painelTituloLinha.textContent = tituloPainel;
+                }
+
+                if (informacoesTituloLinha) {
+                    informacoesTituloLinha.textContent = tituloInformacoes;
+                }
 
                 if (totalAtualLinha) {
                     totalAtualLinha.textContent = atual;
