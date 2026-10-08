@@ -1028,10 +1028,6 @@
            NOVO RESUMO: MELHORIA + VENCIDAS
         ========================================================= */
 
-        .cards {
-            grid-template-columns: repeat(5, minmax(0, 1fr));
-        }
-
         .improvement {
             border-left: 5px solid #2ecc71;
         }
@@ -1121,6 +1117,65 @@
             color: #218c55;
         }
 
+        .card-actions {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            gap: 5px;
+            z-index: 2;
+        }
+
+        .card-action-btn {
+            width: 29px;
+            height: 29px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            border: 1px solid #dce2e7;
+            border-radius: 7px;
+            background: #fff;
+            color: #66727d;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .card-action-btn:hover {
+            color: #2980b9;
+            background: #f5faff;
+            border-color: #bcdcf3;
+        }
+
+        .card-action-btn.danger:hover {
+            color: #c0392b;
+            background: #fff5f4;
+            border-color: #f0c7c2;
+        }
+
+        .cards-ocultos-area {
+            margin: 0 22px 14px;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .restaurar-card-btn {
+            min-height: 34px;
+            padding: 7px 11px;
+            border: 1px dashed #b9c8d3;
+            border-radius: 8px;
+            background: #fff;
+            color: #60717d;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .restaurar-card-btn:hover {
+            background: #f5faff;
+            color: #2479ad;
+            border-color: #9bc7e5;
+        }
+
         .resumo-sub {
             width: 100%;
             margin-top: 8px;
@@ -1180,7 +1235,7 @@
            INFORMAÇÕES ADICIONAIS FLEXÍVEIS
         ========================================================= */
         .resumo-linha-grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         }
 
         .info-adicional-section {
@@ -1498,6 +1553,27 @@
 
 
 
+
+    <!-- Modal do card de melhoria -->
+    <div id="melhoriaModal" class="info-modal oculto" aria-hidden="true">
+        <div class="info-modal-box">
+            <h3>Editar card de melhoria</h3>
+            <p>Altere o título exibido e o valor base usado no cálculo do percentual.</p>
+
+            <label for="melhoriaTituloInput">Título</label>
+            <input id="melhoriaTituloInput" type="text" maxlength="80"
+                placeholder="Ex.: Melhoria desde o início">
+
+            <label for="melhoriaBaseInput">Valor base</label>
+            <input id="melhoriaBaseInput" type="number" min="0" step="1" placeholder="0">
+
+            <div class="info-modal-actions">
+                <button id="btnCancelarMelhoria" class="info-cancelar-btn" type="button">Cancelar</button>
+                <button id="btnSalvarMelhoria" class="info-salvar-btn" type="button">Salvar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal do indicador principal da linha -->
     <div id="resumoPrincipalModal" class="info-modal oculto" aria-hidden="true">
         <div class="info-modal-box">
@@ -1600,13 +1676,7 @@
                 <div class="card-title">Total Geral</div>
                 <div id="totalGeral" class="card-value">0</div>
             </div>
-
-            <div class="card improvement">
-                <div class="card-title">Melhoria Geral</div>
-                <div id="melhoriaGeral" class="card-value">—</div>
-            </div>
-
-        </section>
+</section>
 
 
         <!-- =========================================
@@ -1648,24 +1718,34 @@
                     <span class="resumo-sub">notas/etiquetas no gráfico</span>
                 </div>
 
-                <div class="resumo-item melhoria-item">
-                    <button type="button" class="edit-btn admin-only" data-field="valor_base" data-label="Valor base"
-                        aria-label="Editar valor base">✎</button>
+                <div id="cardMelhoriaLinha" class="resumo-item melhoria-item">
+                    <div class="card-actions admin-only">
+                        <button id="editarMelhoria" type="button" class="card-action-btn"
+                            aria-label="Editar card de melhoria" title="Editar">✎</button>
+                        <button id="removerMelhoria" type="button" class="card-action-btn danger"
+                            aria-label="Remover card de melhoria" title="Remover">×</button>
+                    </div>
 
-                    <span class="resumo-label">Melhoria desde o início</span>
+                    <span id="melhoriaTituloLinha" class="resumo-label">Melhoria desde o início</span>
                     <span id="melhoriaLinha" class="resumo-value melhoria-value">—</span>
                     <span id="comparacaoBaseLinha" class="resumo-sub">Base não definida</span>
                 </div>
 
-                <div class="resumo-item vencidas-item">
-                    <button id="editarResumoPrincipal" type="button" class="edit-btn admin-only"
-                        aria-label="Editar indicador principal" title="Editar indicador principal">✎</button>
+                <div id="cardResumoPrincipal" class="resumo-item vencidas-item">
+                    <div class="card-actions admin-only">
+                        <button id="editarResumoPrincipal" type="button" class="card-action-btn"
+                            aria-label="Editar indicador principal" title="Editar">✎</button>
+                        <button id="removerResumoPrincipal" type="button" class="card-action-btn danger"
+                            aria-label="Remover indicador principal" title="Remover">×</button>
+                    </div>
 
                     <span id="resumoTituloLinha" class="resumo-label">Vencidas</span>
                     <span id="resumoValorLinha" class="resumo-value">0</span>
                     <span class="resumo-sub">indicador da linha</span>
                 </div>
             </div>
+
+            <div id="cardsOcultosArea" class="cards-ocultos-area admin-only" style="display:none"></div>
 
             <div id="informacoesAdicionaisSection" class="info-adicional-section">
                 <div class="info-adicional-header">
@@ -2078,8 +2158,11 @@
 
 
         let valorBase = [];
+        let melhoriaTitulo = [];
+        let melhoriaVisivel = [];
         let resumoTitulo = [];
         let resumoValor = [];
+        let resumoVisivel = [];
         let informacoesAdicionais = [];
 
         let dadosPainel = [];
@@ -2123,8 +2206,11 @@
                     vermelha,
                     nd,
                     valor_base,
+                    melhoria_titulo,
+                    melhoria_visivel,
                     resumo_titulo,
-                    resumo_valor
+                    resumo_valor,
+                    resumo_visivel
                 `);
 
             if (error) {
@@ -2148,8 +2234,11 @@
             atuais.nd = dadosPainel.map(item => item?.nd ?? 0);
 
             valorBase = dadosPainel.map(item => item?.valor_base ?? 0);
+            melhoriaTitulo = dadosPainel.map(item => item?.melhoria_titulo?.trim() || 'Melhoria desde o início');
+            melhoriaVisivel = dadosPainel.map(item => item?.melhoria_visivel !== false);
             resumoTitulo = dadosPainel.map(item => item?.resumo_titulo?.trim() || 'Vencidas');
             resumoValor = dadosPainel.map(item => Number(item?.resumo_valor ?? 0));
+            resumoVisivel = dadosPainel.map(item => item?.resumo_visivel !== false);
 
             const { data: infosData, error: infosError } = await supabaseClient
                 .from('painel_notas_info')
@@ -2229,19 +2318,7 @@
                 totalAmarela +
                 totalVermelha +
                 totalNd;
-
-            const totalBase = valorBase.reduce(
-                (soma, valor) => soma + Number(valor || 0),
-                0
-            );
-
-            const melhoriaGeral =
-                calcularPercentualMelhoria(
-                    totalBase,
-                    totalGeral
-                );
-
-            const elTotalAmarela =
+const elTotalAmarela =
                 document.getElementById('totalAmarela');
 
             const elTotalVermelha =
@@ -2252,11 +2329,7 @@
 
             const elTotalGeral =
                 document.getElementById('totalGeral');
-
-            const elMelhoriaGeral =
-                document.getElementById('melhoriaGeral');
-
-            if (elTotalAmarela) {
+if (elTotalAmarela) {
                 elTotalAmarela.textContent = totalAmarela;
             }
 
@@ -2572,8 +2645,11 @@
                     Number(atuais.nd[i] || 0);
 
                 const base = Number(valorBase[i] || 0);
+                const tituloMelhoria = melhoriaTitulo[i] || 'Melhoria desde o início';
+                const exibirMelhoria = melhoriaVisivel[i] !== false;
                 const tituloResumo = resumoTitulo[i] || 'Vencidas';
                 const valorResumo = Number(resumoValor[i] || 0);
+                const exibirResumo = resumoVisivel[i] !== false;
                 const melhoria = calcularPercentualMelhoria(base, atual);
 
                 if (linhaSelecionada) {
@@ -2581,13 +2657,24 @@
                 }
 
                 const totalAtualLinha = document.getElementById('totalAtualLinha');
+                const cardMelhoriaLinha = document.getElementById('cardMelhoriaLinha');
+                const melhoriaTituloLinha = document.getElementById('melhoriaTituloLinha');
                 const melhoriaLinha = document.getElementById('melhoriaLinha');
                 const comparacaoBaseLinha = document.getElementById('comparacaoBaseLinha');
+                const cardResumoPrincipal = document.getElementById('cardResumoPrincipal');
                 const resumoTituloLinha = document.getElementById('resumoTituloLinha');
                 const resumoValorLinha = document.getElementById('resumoValorLinha');
 
                 if (totalAtualLinha) {
                     totalAtualLinha.textContent = atual;
+                }
+
+                if (cardMelhoriaLinha) {
+                    cardMelhoriaLinha.style.display = exibirMelhoria ? 'flex' : 'none';
+                }
+
+                if (melhoriaTituloLinha) {
+                    melhoriaTituloLinha.textContent = tituloMelhoria;
                 }
 
                 if (melhoriaLinha) {
@@ -2602,6 +2689,10 @@
                             : 'Base não definida';
                 }
 
+                if (cardResumoPrincipal) {
+                    cardResumoPrincipal.style.display = exibirResumo ? 'flex' : 'none';
+                }
+
                 if (resumoTituloLinha) {
                     resumoTituloLinha.textContent = tituloResumo;
                 }
@@ -2610,6 +2701,7 @@
                     resumoValorLinha.textContent = valorResumo;
                 }
 
+                renderizarCardsOcultos?.(i);
                 renderizarInformacoesAdicionais(i);
 
                 panel?.classList.add('aberto');
@@ -3252,6 +3344,172 @@
 
 
 
+
+        // =========================================================
+        // CARD DE MELHORIA DINÂMICO / REMOVÍVEL
+        // =========================================================
+
+        function abrirModalMelhoria() {
+            if (!usuarioAdmin || indiceSelecionado < 0) {
+                alert('Selecione uma linha no gráfico primeiro.');
+                return;
+            }
+
+            const tituloInput = document.getElementById('melhoriaTituloInput');
+            const baseInput = document.getElementById('melhoriaBaseInput');
+            const modal = document.getElementById('melhoriaModal');
+
+            if (tituloInput) {
+                tituloInput.value = melhoriaTitulo[indiceSelecionado] || 'Melhoria desde o início';
+            }
+
+            if (baseInput) {
+                baseInput.value = Number(valorBase[indiceSelecionado] || 0);
+            }
+
+            modal?.classList.remove('oculto');
+            modal?.setAttribute('aria-hidden', 'false');
+            setTimeout(() => tituloInput?.focus(), 0);
+        }
+
+        function fecharModalMelhoria() {
+            const modal = document.getElementById('melhoriaModal');
+            modal?.classList.add('oculto');
+            modal?.setAttribute('aria-hidden', 'true');
+        }
+
+        async function salvarMelhoria() {
+            if (!usuarioAdmin || indiceSelecionado < 0) return;
+
+            const titulo = document.getElementById('melhoriaTituloInput')?.value.trim();
+            const baseDigitada = document.getElementById('melhoriaBaseInput')?.value;
+            const base = Number(baseDigitada);
+
+            if (!titulo) {
+                alert('Digite um título para o card.');
+                return;
+            }
+
+            if (!Number.isInteger(base) || base < 0) {
+                alert('Digite um valor base inteiro maior ou igual a zero.');
+                return;
+            }
+
+            const { error } = await supabaseClient
+                .from('painel_notas')
+                .update({
+                    melhoria_titulo: titulo,
+                    valor_base: base,
+                    melhoria_visivel: true
+                })
+                .eq('linha', labels[indiceSelecionado]);
+
+            if (error) {
+                console.error('Erro ao salvar card de melhoria:', error);
+                alert('Não foi possível salvar o card de melhoria.');
+                return;
+            }
+
+            fecharModalMelhoria();
+            await recarregarPainel();
+        }
+
+        async function alterarVisibilidadeCard(campo, visivel) {
+            if (!usuarioAdmin || indiceSelecionado < 0) return;
+
+            const { error } = await supabaseClient
+                .from('painel_notas')
+                .update({ [campo]: visivel })
+                .eq('linha', labels[indiceSelecionado]);
+
+            if (error) {
+                console.error('Erro ao alterar visibilidade do card:', error);
+                alert('Não foi possível alterar a visibilidade do card.');
+                return;
+            }
+
+            await recarregarPainel();
+        }
+
+        async function removerMelhoria() {
+            if (!confirm('Remover este card desta linha? Você poderá restaurá-lo depois.')) return;
+            await alterarVisibilidadeCard('melhoria_visivel', false);
+        }
+
+        async function removerResumoPrincipal() {
+            if (!confirm('Remover este card desta linha? Você poderá restaurá-lo depois.')) return;
+            await alterarVisibilidadeCard('resumo_visivel', false);
+        }
+
+        function renderizarCardsOcultos(i) {
+            const area = document.getElementById('cardsOcultosArea');
+            if (!area) return;
+
+            area.innerHTML = '';
+
+            if (melhoriaVisivel[i] === false) {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'restaurar-card-btn';
+                btn.textContent = '+ Restaurar card de melhoria';
+                btn.addEventListener('click', () =>
+                    alterarVisibilidadeCard('melhoria_visivel', true)
+                );
+                area.appendChild(btn);
+            }
+
+            if (resumoVisivel[i] === false) {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'restaurar-card-btn';
+                btn.textContent = '+ Restaurar indicador';
+                btn.addEventListener('click', () =>
+                    alterarVisibilidadeCard('resumo_visivel', true)
+                );
+                area.appendChild(btn);
+            }
+
+            area.style.display = area.children.length ? 'flex' : 'none';
+        }
+
+        function configurarCardsDinamicos() {
+            document.getElementById('editarMelhoria')
+                ?.addEventListener('click', event => {
+                    event.stopPropagation();
+                    abrirModalMelhoria();
+                });
+
+            document.getElementById('removerMelhoria')
+                ?.addEventListener('click', event => {
+                    event.stopPropagation();
+                    removerMelhoria();
+                });
+
+            document.getElementById('removerResumoPrincipal')
+                ?.addEventListener('click', event => {
+                    event.stopPropagation();
+                    removerResumoPrincipal();
+                });
+
+            document.getElementById('btnCancelarMelhoria')
+                ?.addEventListener('click', fecharModalMelhoria);
+
+            document.getElementById('btnSalvarMelhoria')
+                ?.addEventListener('click', salvarMelhoria);
+
+            document.getElementById('melhoriaModal')
+                ?.addEventListener('click', event => {
+                    if (event.target?.id === 'melhoriaModal') {
+                        fecharModalMelhoria();
+                    }
+                });
+
+            document.getElementById('melhoriaBaseInput')
+                ?.addEventListener('keydown', event => {
+                    if (event.key === 'Enter') salvarMelhoria();
+                });
+        }
+
         // =========================================================
         // INDICADOR PRINCIPAL DINÂMICO
         // =========================================================
@@ -3316,7 +3574,8 @@
                 .from('painel_notas')
                 .update({
                     resumo_titulo: titulo,
-                    resumo_valor: valor
+                    resumo_valor: valor,
+                    resumo_visivel: true
                 })
                 .eq('linha', linha);
 
@@ -3658,6 +3917,9 @@
 
 
             configurarResumoPrincipal();
+
+
+            configurarCardsDinamicos();
 
 
             configurarInformacoesAdicionais();
