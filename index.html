@@ -907,15 +907,16 @@
         .card-action-btn {
             width: 29px;
             height: 29px;
+            padding: 0;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 0;
             border: 1px solid #dce2e7;
             border-radius: 7px;
             background: #fff;
             color: #66727d;
             font-size: 16px;
+            line-height: 1;
             cursor: pointer;
         }
 
@@ -950,8 +951,8 @@
         }
 
         .restaurar-card-btn:hover {
-            background: #f5faff;
             color: #2479ad;
+            background: #f5faff;
             border-color: #9bc7e5;
         }
 
@@ -1292,7 +1293,8 @@
                 <div class="card-title">Total Geral</div>
                 <div id="totalGeral" class="card-value">0</div>
             </div>
-</section>
+
+        </section>
 
 
         <!-- =========================================
@@ -1639,11 +1641,8 @@
                     vermelha,
                     nd,
                     valor_base,
-                    melhoria_titulo,
-                    melhoria_visivel,
                     resumo_titulo,
-                    resumo_valor,
-                    resumo_visivel
+                    resumo_valor
                 `);
 
             if (error) {
@@ -1667,11 +1666,41 @@
             atuais.nd = dadosPainel.map(item => item?.nd ?? 0);
 
             valorBase = dadosPainel.map(item => item?.valor_base ?? 0);
-            melhoriaTitulo = dadosPainel.map(item => item?.melhoria_titulo?.trim() || 'Melhoria desde o início');
-            melhoriaVisivel = dadosPainel.map(item => item?.melhoria_visivel !== false);
             resumoTitulo = dadosPainel.map(item => item?.resumo_titulo?.trim() || 'Vencidas');
             resumoValor = dadosPainel.map(item => Number(item?.resumo_valor ?? 0));
-            resumoVisivel = dadosPainel.map(item => item?.resumo_visivel !== false);
+
+            // Configurações opcionais dos cards.
+            // Esta consulta é separada de propósito: se houver qualquer
+            // problema com esses campos, o gráfico e a tabela continuam.
+            melhoriaTitulo = labels.map(() => 'Melhoria desde o início');
+            melhoriaVisivel = labels.map(() => true);
+            resumoVisivel = labels.map(() => true);
+
+            const { data: configCardsData, error: configCardsError } = await supabaseClient
+                .from('painel_notas')
+                .select('linha, melhoria_titulo, melhoria_visivel, resumo_visivel');
+
+            if (configCardsError) {
+                console.warn(
+                    'Não foi possível carregar as configurações opcionais dos cards. Usando padrões:',
+                    configCardsError
+                );
+            } else {
+                labels.forEach((linha, indice) => {
+                    const config = configCardsData?.find(item => item.linha === linha);
+
+                    if (!config) return;
+
+                    melhoriaTitulo[indice] =
+                        config.melhoria_titulo?.trim() || 'Melhoria desde o início';
+
+                    melhoriaVisivel[indice] =
+                        config.melhoria_visivel !== false;
+
+                    resumoVisivel[indice] =
+                        config.resumo_visivel !== false;
+                });
+            }
 
             const { data: infosData, error: infosError } = await supabaseClient
                 .from('painel_notas_info')
@@ -1751,7 +1780,19 @@
                 totalAmarela +
                 totalVermelha +
                 totalNd;
-const elTotalAmarela =
+
+            const totalBase = valorBase.reduce(
+                (soma, valor) => soma + Number(valor || 0),
+                0
+            );
+
+            const melhoriaGeral =
+                calcularPercentualMelhoria(
+                    totalBase,
+                    totalGeral
+                );
+
+            const elTotalAmarela =
                 document.getElementById('totalAmarela');
 
             const elTotalVermelha =
@@ -1762,7 +1803,11 @@ const elTotalAmarela =
 
             const elTotalGeral =
                 document.getElementById('totalGeral');
-if (elTotalAmarela) {
+
+            const elMelhoriaGeral =
+                document.getElementById('melhoriaGeral');
+
+            if (elTotalAmarela) {
                 elTotalAmarela.textContent = totalAmarela;
             }
 
@@ -2016,12 +2061,13 @@ if (elTotalAmarela) {
         // =========================================================
 
         function renderizarCardsOcultos() {
-            // Na página pública não há controles de restauração.
+            // A página pública apenas respeita a visibilidade salva.
         }
 
         function atualizarVencimento(i) {
 
             if (i === indiceSelecionado) {
+                renderizarCardsOcultos(i);
                 renderizarInformacoesAdicionais(i);
                 return;
             }
@@ -2101,7 +2147,7 @@ if (elTotalAmarela) {
                     resumoValorLinha.textContent = valorResumo;
                 }
 
-                renderizarCardsOcultos?.(i);
+                renderizarCardsOcultos(i);
                 renderizarInformacoesAdicionais(i);
 
                 panel?.classList.add('aberto');
