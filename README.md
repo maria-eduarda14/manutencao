@@ -1,22 +1,42 @@
 # Notas de Manutenção de Embalagem
 
-Projeto reorganizado seguindo o mesmo padrão estrutural usado no projeto do gráfico de tendências.
+Dashboard web para acompanhamento das notas de manutenção de embalagem, com visualização gráfica, detalhamento por linha e área administrativa para atualização das informações.
 
-## Estrutura
+O projeto utiliza **HTML, CSS, JavaScript, Chart.js e Supabase**, com os dados armazenados em banco e carregados dinamicamente na aplicação.
+
+## Funcionalidades
+
+- Visualização geral das notas por categoria:
+  - Amarelas
+  - Vermelhas
+  - ND
+  - Total geral
+- Gráfico interativo por linha.
+- Detalhamento individual das linhas.
+- Indicadores personalizados por linha.
+- Cálculo de melhoria em relação ao valor inicial.
+- Informações adicionais configuráveis.
+- Títulos personalizáveis.
+- Área administrativa protegida por autenticação.
+
+## Estrutura do projeto
 
 ```text
 manutencao/
 ├── css/
 │   ├── style.css
 │   └── admin.css
+│
 ├── img/
-│   ├── logo.png
-│   └── README.md
+│   └── logo.png
+│
 ├── js/
 │   ├── index.js
 │   └── admin.js
+│
 ├── supabase/
 │   └── config.js
+│
 ├── admin.html
 ├── index.html
 ├── login.html
@@ -25,66 +45,116 @@ manutencao/
 └── README.md
 ```
 
-## Responsabilidades
+## Organização
 
 ### `index.html`
-Estrutura da página pública.
+
+Página pública do dashboard.
+
+Exibe o gráfico, os indicadores gerais, o detalhamento das linhas e as informações cadastradas no painel administrativo.
 
 ### `admin.html`
-Estrutura da área administrativa, incluindo os elementos usados no login, edição e gerenciamento do painel.
+
+Área administrativa da aplicação.
+
+Permite atualizar os dados das linhas, editar indicadores, alterar títulos e gerenciar as informações adicionais exibidas no dashboard.
 
 ### `login.html`
-Entrada alternativa para a área administrativa. Ele redireciona para `admin.html` e preserva parâmetros de autenticação do Supabase.
 
-### `original.html`
-Cópia da página pública antes da reorganização, mantida apenas como referência/backup.
+Página de entrada para acesso à área administrativa.
 
-### `css/style.css`
-Estilos da página pública.
+Redireciona para o painel administrativo preservando os parâmetros utilizados pelo fluxo de autenticação do Supabase.
 
-### `css/admin.css`
-Estilos da área administrativa.
+### `css/`
 
-### `js/index.js`
-Toda a lógica da página pública: carregamento dos dados, gráfico, cards, tabela e interações.
+Responsável pela estilização da aplicação.
 
-### `js/admin.js`
-Lógica administrativa: autenticação, edição, cards dinâmicos, informações adicionais e demais interações.
+- `style.css`: estilos da página pública.
+- `admin.css`: estilos e componentes específicos da área administrativa.
 
-### `supabase/config.js`
-Configuração compartilhada do cliente Supabase.
+### `js/`
+
+Contém a lógica da aplicação.
+
+- `index.js`: carregamento dos dados, gráfico, cards e interações da página pública.
+- `admin.js`: autenticação, edição dos dados e funcionalidades administrativas.
+
+### `supabase/`
+
+Contém a configuração utilizada para conexão com o Supabase.
+
+- `config.js`: inicialização do cliente Supabase compartilhado pela aplicação.
 
 ### `img/`
-Imagens do projeto. Coloque o arquivo `logo.png` aqui.
 
-## Banco de dados
+Arquivos de imagem utilizados pelo projeto.
 
-Nenhuma tabela, coluna, registro, usuário ou política RLS foi alterada nesta reorganização.
-
-O projeto continua apontando para a mesma base Supabase e utiliza os mesmos nomes de tabelas e campos. Portanto, os dados existentes permanecem intactos.
-
-## Logo
-
-Adicione:
+A logo principal deve ser adicionada como:
 
 ```text
 img/logo.png
 ```
 
-Os dois HTMLs já estão configurados para usar esse caminho.
+### `original.html`
 
-## GitHub Pages
+Arquivo mantido como referência da versão anterior da página pública antes da reorganização da estrutura do projeto.
 
-Como `index.html` continua na raiz, o projeto permanece compatível com GitHub Pages.
+## Tecnologias utilizadas
 
-A área administrativa fica em:
+- HTML5
+- CSS3
+- JavaScript
+- Chart.js
+- Supabase
+- Git
+- GitHub
+- GitHub Pages
+
+## Banco de dados
+
+Os dados exibidos no dashboard são armazenados no Supabase.
+
+A aplicação utiliza principalmente as tabelas responsáveis pelos dados gerais do painel e pelas informações adicionais de cada linha.
+
+As alterações realizadas pela área administrativa são persistidas diretamente no banco, permitindo que a página pública apresente sempre os dados mais recentes.
+
+## Área administrativa
+
+O acesso administrativo utiliza o sistema de autenticação do Supabase.
+
+Usuários autorizados podem:
+
+- atualizar valores das linhas;
+- editar indicadores;
+- alterar títulos;
+- adicionar informações complementares;
+- editar ou excluir informações existentes;
+- ocultar e restaurar determinados cards.
+
+As permissões de alteração são controladas através das políticas de segurança do Supabase.
+
+## Página pública
+
+A página pública não exige autenticação e pode ser acessada através do:
+
+```text
+index.html
+```
+
+Ela possui apenas acesso de leitura aos dados disponibilizados pelo Supabase.
+
+## Deploy
+
+O projeto pode ser publicado como uma aplicação estática através do **GitHub Pages**.
+
+Como o arquivo `index.html` está localizado na raiz do projeto, ele é utilizado automaticamente como página inicial.
+
+A área administrativa pode ser acessada através de:
 
 ```text
 /admin.html
 ```
 
-E a entrada alternativa de login em:
+## Objetivo do projeto
 
-```text
-/login.html
-```
+Centralizar e facilitar o acompanhamento das notas de manutenção de embalagem, oferecendo uma visualização mais clara da situação de cada linha e permitindo que as informações sejam atualizadas de forma simples através de uma área administrativa.
