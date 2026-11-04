@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notas de Manutenção de Embalagem</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- =========================================
+             CABEÇALHO
+        ========================================== -->
+        <header>
+            <div class="logo-box">
+                <img class="logo" src="img/logo.png" alt="Logo">
+            </div>
+
+            <div class="header-row">
+                <div class="header-text">
+                    <h1>Notas de Manutenção de Embalagem</h1>
+                </div>
+
+                <!-- Só aparece no modo admin -->
+                <div id="adminBadge" class="admin-badge admin-only">
+                    Modo administrador
+                </div>
+            </div>
+        </header>
+
+
+        <!-- =========================================
+             TOTAIS GERAIS
+             Estes valores serão calculados pelo JS.
+        ========================================== -->
+        <section class="cards">
+
+            <div class="card yellow">
+                <div class="card-title">Notas Amarelas</div>
+                <div id="totalAmarela" class="card-value">0</div>
+            </div>
+
+            <div class="card red">
+                <div class="card-title">Notas Vermelhas</div>
+                <div id="totalVermelha" class="card-value">0</div>
+            </div>
+
+            <div class="card gray">
+                <div class="card-title">ND</div>
+                <div id="totalNd" class="card-value">0</div>
+            </div>
+
+            <div class="card total">
+                <div class="card-title">Total Geral</div>
+                <div id="totalGeral" class="card-value">0</div>
+            </div>
+
+        </section>
+
+
+        <!-- =========================================
+             GRÁFICO
+        ========================================== -->
+        <section class="chart-container">
+
+            <div class="chart-header">
+
+                <div>
+                    <h2>Distribuição das notas por linha</h2>
+                </div>
+
+                <div class="admin-hint admin-only">
+                    Selecione uma linha para editar seus dados
+                </div>
+
+            </div>
+
+            <div class="chart-wrapper">
+                <canvas id="notasChart"></canvas>
+            </div>
+
+        </section>
+
+
+        <!-- =========================================
+             PAINEL DE VENCIMENTO
+        ========================================== -->
+        <section id="vencimentoPanel" class="vencimento-panel">
+            <div class="vencimento-header">
+                <div class="vencimento-title-wrap">
+                    <h3 id="painelTituloLinha">Evolução e situação da linha</h3>
+                    <button id="editarPainelTitulo" type="button"
+                        class="title-edit-btn admin-only"
+                        aria-label="Editar título do painel" title="Editar título">✎</button>
+                </div>
+                <span id="linhaSelecionada" class="linha-selecionada">—</span>
+            </div>
+            <div class="resumo-linha-grid">
+                <div class="resumo-item atual-item">
+                    <span class="resumo-label">Total atual</span>
+                    <span id="totalAtualLinha" class="resumo-value">0</span>
+                    <span class="resumo-sub">notas/etiquetas no gráfico</span>
+                </div>
+
+                <div id="cardMelhoriaLinha" class="resumo-item melhoria-item">
+                    <div class="card-actions admin-only">
+                        <button id="editarMelhoria" type="button" class="card-action-btn"
+                            aria-label="Editar card de melhoria" title="Editar">✎</button>
+                        <button id="removerMelhoria" type="button" class="card-action-btn danger"
+                            aria-label="Remover card de melhoria" title="Remover">×</button>
+                    </div>
+
+                    <span id="melhoriaTituloLinha" class="resumo-label">Melhoria desde o início</span>
+                    <span id="melhoriaLinha" class="resumo-value melhoria-value">—</span>
+                    <span id="comparacaoBaseLinha" class="resumo-sub">Base não definida</span>
+                </div>
+
+                <div id="cardResumoPrincipal" class="resumo-item vencidas-item">
+                    <div class="card-actions admin-only">
+                        <button id="editarResumoPrincipal" type="button" class="card-action-btn"
+                            aria-label="Editar indicador principal" title="Editar">✎</button>
+                        <button id="removerResumoPrincipal" type="button" class="card-action-btn danger"
+                            aria-label="Remover indicador principal" title="Remover">×</button>
+                    </div>
+
+                    <span id="resumoTituloLinha" class="resumo-label">Vencidas</span>
+                    <span id="resumoValorLinha" class="resumo-value">0</span>
+                    <span class="resumo-sub">indicador da linha</span>
+                </div>
+            </div>
+
+            <div id="cardsOcultosArea" class="cards-ocultos-area admin-only" style="display:none"></div>
+
+            <div id="informacoesAdicionaisSection" class="info-adicional-section">
+                <div class="info-adicional-header">
+                    <div>
+                        <div class="info-title-row">
+                            <div id="informacoesTituloLinha" class="info-adicional-titulo">Informações adicionais</div>
+                            <button id="editarInformacoesTitulo" type="button"
+                                class="title-edit-btn admin-only"
+                                aria-label="Editar título das informações adicionais" title="Editar título">✎</button>
+                        </div>
+                        <div class="info-adicional-subtitulo admin-only">
+                            Use este espaço para registrar detalhes específicos desta linha, como programações,
+                            reavaliações ou outros status relevantes.
+                        </div>
+                    </div>
+
+                    <button id="btnAdicionarInformacao" type="button" class="add-info-btn admin-only">
+                        + Adicionar informação
+                    </button>
+                </div>
+
+                <div id="informacoesAdicionaisLista" class="info-adicional-lista"></div>
+            </div>
+        </section>
+
+        <section class="table-container">
+
+            <div class="table-header">
+
+                <h2>Detalhamento por linha</h2>
+
+                <span class="admin-hint admin-only">
+                    Clique na linha para alterar um valor
+                </span>
+
+            </div>
+
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Classificação</th>
+
+                        <th>Linha 1</th>
+                        <th>Linha 2</th>
+                        <th>Linha 3</th>
+                        <th>Linha 4</th>
+                        <th>Linha 5</th>
+                        <th>Linha 6</th>
+                        <th>Linha 7</th>
+                        <th>Linha 8</th>
+                        <th>Linha 9</th>
+                        <th>Linha 10</th>
+                        <th>Linha 14</th>
+                    </tr>
+                </thead>
+
+
+                <!-- O JavaScript poderá preencher daqui para frente -->
+                <tbody id="detalhamentoBody">
+
+                    <tr id="rowAmarela">
+
+                        <td>
+                            <span class="badge badge-yellow">
+                                Amarela
+                            </span>
+                        </td>
+
+                        <td data-linha="Linha 1" data-field="amarela">0</td>
+                        <td data-linha="Linha 2" data-field="amarela">0</td>
+                        <td data-linha="Linha 3" data-field="amarela">0</td>
+                        <td data-linha="Linha 4" data-field="amarela">0</td>
+                        <td data-linha="Linha 5" data-field="amarela">0</td>
+                        <td data-linha="Linha 6" data-field="amarela">0</td>
+                        <td data-linha="Linha 7" data-field="amarela">0</td>
+                        <td data-linha="Linha 8" data-field="amarela">0</td>
+                        <td data-linha="Linha 9" data-field="amarela">0</td>
+                        <td data-linha="Linha 10" data-field="amarela">0</td>
+                        <td data-linha="Linha 14" data-field="amarela">0</td>
+
+                    </tr>
+
+
+                    <tr id="rowVermelha">
+
+                        <td>
+                            <span class="badge badge-red">
+                                Vermelha
+                            </span>
+                        </td>
+
+                        <td data-linha="Linha 1" data-field="vermelha">0</td>
+                        <td data-linha="Linha 2" data-field="vermelha">0</td>
+                        <td data-linha="Linha 3" data-field="vermelha">0</td>
+                        <td data-linha="Linha 4" data-field="vermelha">0</td>
+                        <td data-linha="Linha 5" data-field="vermelha">0</td>
+                        <td data-linha="Linha 6" data-field="vermelha">0</td>
+                        <td data-linha="Linha 7" data-field="vermelha">0</td>
+                        <td data-linha="Linha 8" data-field="vermelha">0</td>
+                        <td data-linha="Linha 9" data-field="vermelha">0</td>
+                        <td data-linha="Linha 10" data-field="vermelha">0</td>
+                        <td data-linha="Linha 14" data-field="vermelha">0</td>
+
+                    </tr>
+
+
+                    <tr id="rowNd">
+
+                        <td>
+                            <span class="badge badge-gray">
+                                ND
+                            </span>
+                        </td>
+
+                        <td data-linha="Linha 1" data-field="nd">0</td>
+                        <td data-linha="Linha 2" data-field="nd">0</td>
+                        <td data-linha="Linha 3" data-field="nd">0</td>
+                        <td data-linha="Linha 4" data-field="nd">0</td>
+                        <td data-linha="Linha 5" data-field="nd">0</td>
+                        <td data-linha="Linha 6" data-field="nd">0</td>
+                        <td data-linha="Linha 7" data-field="nd">0</td>
+                        <td data-linha="Linha 8" data-field="nd">0</td>
+                        <td data-linha="Linha 9" data-field="nd">0</td>
+                        <td data-linha="Linha 10" data-field="nd">0</td>
+                        <td data-linha="Linha 14" data-field="nd">0</td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </section>
+
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase/config.js"></script>
+    <script src="js/index.js"></script>
+</body>
+
+</html>

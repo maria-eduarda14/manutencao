@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notas de Manutenção de Embalagem</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+
+<body>
+    <!-- CRIAR SENHA APÓS O CONVITE -->
+    <div id="criarSenhaAdmin" class="login-admin oculto">
+
+        <div class="login-box">
+
+            <h2>Definir senha</h2>
+
+            <p class="login-texto">
+                Crie sua senha para concluir o primeiro acesso à área administrativa.
+            </p>
+
+            <input id="nomeAdmin" type="text" placeholder="Seu nome">
+
+            <div class="password-field">
+                <input id="novaSenhaAdmin" type="password" placeholder="Nova senha">
+                <button type="button" class="password-toggle" data-target="novaSenhaAdmin" aria-label="Mostrar senha"
+                    title="Mostrar senha">
+                    <svg class="eye-open" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" stroke="currentColor"
+                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                        <circle cx="12" cy="12" r="2.7" stroke="currentColor" stroke-width="1.8" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="password-field">
+                <input id="confirmarSenhaAdmin" type="password" placeholder="Confirmar senha">
+                <button type="button" class="password-toggle" data-target="confirmarSenhaAdmin"
+                    aria-label="Mostrar senha" title="Mostrar senha">
+                    <svg class="eye-open" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" stroke="currentColor"
+                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                        <circle cx="12" cy="12" r="2.7" stroke="currentColor" stroke-width="1.8" />
+                    </svg>
+                </button>
+            </div>
+
+            <button id="btnCriarSenhaAdmin" type="button">
+                Salvar senha
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         LOGIN ADMIN
+    ========================================== -->
+    <div id="loginAdmin" class="login-admin">
+
+        <div class="login-box">
+
+            <h2>Administração</h2>
+
+            <input id="adminEmail" type="email" placeholder="E-mail">
+
+            <div class="password-field">
+                <input id="adminSenha" type="password" placeholder="Senha">
+                <button type="button" class="password-toggle" data-target="adminSenha" aria-label="Mostrar senha"
+                    title="Mostrar senha">
+                    <svg class="eye-open" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" stroke="currentColor"
+                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                        <circle cx="12" cy="12" r="2.7" stroke="currentColor" stroke-width="1.8" />
+                    </svg>
+                </button>
+            </div>
+
+            <button id="btnLoginAdmin" type="button">
+                Entrar
+            </button>
+
+            <button id="btnDefinirSenhaAdmin" class="login-link-btn" type="button">
+                Primeiro acesso / redefinir senha
+            </button>
+
+            <p class="login-ajuda">
+                No primeiro acesso, informe seu e-mail acima e use esta opção para criar ou redefinir sua senha.
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Modal do card de melhoria -->
+    <div id="melhoriaModal" class="info-modal oculto" aria-hidden="true">
+        <div class="info-modal-box">
+            <h3>Editar card de melhoria</h3>
+            <p>Você pode alterar o título do card e o valor base usado para calcular o percentual.</p>
+
+            <label for="melhoriaTituloInput">Título</label>
+            <input id="melhoriaTituloInput" type="text" maxlength="80"
+                placeholder="Ex.: Melhoria desde o início">
+
+            <label for="melhoriaBaseInput">Valor base</label>
+            <input id="melhoriaBaseInput" type="number" min="0" step="1" placeholder="0">
+
+            <div class="info-modal-actions">
+                <button id="btnCancelarMelhoria" class="info-cancelar-btn" type="button">Cancelar</button>
+                <button id="btnSalvarMelhoria" class="info-salvar-btn" type="button">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal do indicador principal da linha -->
+    <div id="resumoPrincipalModal" class="info-modal oculto" aria-hidden="true">
+        <div class="info-modal-box">
+            <h3>Editar indicador principal</h3>
+            <p>Altere o título e o valor do terceiro card da linha selecionada.</p>
+
+            <label for="resumoTituloInput">Título</label>
+            <input id="resumoTituloInput" type="text" maxlength="80" placeholder="Ex.: Vencidas ou Preventiva">
+
+            <label for="resumoValorInput">Valor</label>
+            <input id="resumoValorInput" type="number" min="0" step="1" placeholder="0">
+
+            <div class="info-modal-actions">
+                <button id="btnCancelarResumoPrincipal" class="info-cancelar-btn" type="button">Cancelar</button>
+                <button id="btnSalvarResumoPrincipal" class="info-salvar-btn" type="button">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de informação adicional -->
+    <div id="infoModal" class="info-modal oculto" aria-hidden="true">
+        <div class="info-modal-box">
+            <h3 id="infoModalTitulo">Adicionar informação</h3>
+            <p>Cadastre um detalhe opcional referente às vencidas da linha selecionada.</p>
+
+            <label for="infoTituloInput">Título</label>
+            <input id="infoTituloInput" type="text" maxlength="80" placeholder="Ex.: Programadas para o FDS">
+
+            <label for="infoQuantidadeInput">Quantidade</label>
+            <input id="infoQuantidadeInput" type="number" min="0" step="1" placeholder="0">
+
+            <div class="info-modal-actions">
+                <button id="btnCancelarInformacao" class="info-cancelar-btn" type="button">Cancelar</button>
+                <button id="btnSalvarInformacao" class="info-salvar-btn" type="button">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- =========================================
+             CABEÇALHO
+        ========================================== -->
+        <header>
+            <div class="logo-box">
+                <img class="logo" src="img/logo.png" alt="Logo">
+            </div>
+
+            <div class="header-row">
+                <div class="header-text">
+                    <h1>Notas de Manutenção de Embalagem</h1>
+                </div>
+
+                <!-- Só aparece quando o administrador está autenticado -->
+                <div id="adminUserArea" class="admin-user-area admin-only">
+                    <div class="admin-user-info" title="Usuário autenticado">
+                        <svg class="admin-user-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" stroke="currentColor" stroke-width="1.8" />
+                            <path d="M4.5 20c.7-3.3 3.5-5.5 7.5-5.5s6.8 2.2 7.5 5.5" stroke="currentColor"
+                                stroke-width="1.8" stroke-linecap="round" />
+                        </svg>
+                        <span id="adminUserName" class="admin-user-name">Administrador</span>
+                    </div>
+
+                    <button id="btnLogoutAdmin" class="logout-btn" type="button">
+                        <svg class="logout-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M10 5H6.5A1.5 1.5 0 0 0 5 6.5v11A1.5 1.5 0 0 0 6.5 19H10" stroke="currentColor"
+                                stroke-width="1.8" stroke-linecap="round" />
+                            <path d="M14 8l4 4-4 4M18 12H9" stroke="currentColor" stroke-width="1.8"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        Sair
+                    </button>
+                </div>
+            </div>
+        </header>
+
+
+        <!-- =========================================
+             TOTAIS GERAIS
+             Estes valores serão calculados pelo JS.
+        ========================================== -->
+        <section class="cards">
+
+            <div class="card yellow">
+                <div class="card-title">Notas Amarelas</div>
+                <div id="totalAmarela" class="card-value">0</div>
+            </div>
+
+            <div class="card red">
+                <div class="card-title">Notas Vermelhas</div>
+                <div id="totalVermelha" class="card-value">0</div>
+            </div>
+
+            <div class="card gray">
+                <div class="card-title">ND</div>
+                <div id="totalNd" class="card-value">0</div>
+            </div>
+
+            <div class="card total">
+                <div class="card-title">Total Geral</div>
+                <div id="totalGeral" class="card-value">0</div>
+            </div>
+
+        </section>
+
+
+        <!-- =========================================
+             GRÁFICO
+        ========================================== -->
+        <section class="chart-container">
+
+            <div class="chart-header">
+
+                <div>
+                    <h2>Distribuição das notas por linha</h2>
+                </div>
+
+                <div class="admin-hint admin-only">
+                    Selecione uma linha para editar seus dados
+                </div>
+
+            </div>
+
+            <div class="chart-wrapper">
+                <canvas id="notasChart"></canvas>
+            </div>
+
+        </section>
+
+
+        <!-- =========================================
+             PAINEL DE VENCIMENTO
+        ========================================== -->
+        <section id="vencimentoPanel" class="vencimento-panel">
+            <div class="vencimento-header">
+                <div class="vencimento-title-wrap">
+                    <h3 id="painelTituloLinha">Evolução e situação da linha</h3>
+                    <button id="editarPainelTitulo" type="button"
+                        class="title-edit-btn admin-only"
+                        aria-label="Editar título do painel" title="Editar título">✎</button>
+                </div>
+                <span id="linhaSelecionada" class="linha-selecionada">—</span>
+            </div>
+            <div class="resumo-linha-grid">
+                <div class="resumo-item atual-item">
+                    <span class="resumo-label">Total atual</span>
+                    <span id="totalAtualLinha" class="resumo-value">0</span>
+                    <span class="resumo-sub">notas/etiquetas no gráfico</span>
+                </div>
+
+                <div id="cardMelhoriaLinha" class="resumo-item melhoria-item">
+                    <div class="card-actions admin-only">
+                        <button id="editarMelhoria" type="button" class="card-action-btn"
+                            aria-label="Editar card de melhoria" title="Editar">✎</button>
+                        <button id="removerMelhoria" type="button" class="card-action-btn danger"
+                            aria-label="Remover card de melhoria" title="Remover">×</button>
+                    </div>
+
+                    <span id="melhoriaTituloLinha" class="resumo-label">Melhoria desde o início</span>
+                    <span id="melhoriaLinha" class="resumo-value melhoria-value">—</span>
+                    <span id="comparacaoBaseLinha" class="resumo-sub">Base não definida</span>
+                </div>
+
+                <div id="cardResumoPrincipal" class="resumo-item vencidas-item">
+                    <div class="card-actions admin-only">
+                        <button id="editarResumoPrincipal" type="button" class="card-action-btn"
+                            aria-label="Editar indicador principal" title="Editar">✎</button>
+                        <button id="removerResumoPrincipal" type="button" class="card-action-btn danger"
+                            aria-label="Remover indicador principal" title="Remover">×</button>
+                    </div>
+
+                    <span id="resumoTituloLinha" class="resumo-label">Vencidas</span>
+                    <span id="resumoValorLinha" class="resumo-value">0</span>
+                    <span class="resumo-sub">indicador da linha</span>
+                </div>
+            </div>
+
+            <div id="cardsOcultosArea" class="cards-ocultos-area admin-only" style="display:none"></div>
+
+            <div id="informacoesAdicionaisSection" class="info-adicional-section">
+                <div class="info-adicional-header">
+                    <div>
+                        <div class="info-title-row">
+                            <div id="informacoesTituloLinha" class="info-adicional-titulo">Informações adicionais</div>
+                            <button id="editarInformacoesTitulo" type="button"
+                                class="title-edit-btn admin-only"
+                                aria-label="Editar título das informações adicionais" title="Editar título">✎</button>
+                        </div>
+                        <div class="info-adicional-subtitulo admin-only">
+                            Use este espaço para registrar detalhes específicos desta linha, como programações,
+                            reavaliações ou outros status relevantes.
+                        </div>
+                    </div>
+
+                    <button id="btnAdicionarInformacao" type="button" class="add-info-btn admin-only">
+                        + Adicionar informação
+                    </button>
+                </div>
+
+                <div id="informacoesAdicionaisLista" class="info-adicional-lista"></div>
+            </div>
+        </section>
+
+        <section class="table-container">
+
+            <div class="table-header">
+
+                <h2>Detalhamento por linha</h2>
+
+                <span class="admin-hint admin-only">
+                    Clique na linha para alterar um valor
+                </span>
+
+            </div>
+
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Classificação</th>
+
+                        <th>Linha 1</th>
+                        <th>Linha 2</th>
+                        <th>Linha 3</th>
+                        <th>Linha 4</th>
+                        <th>Linha 5</th>
+                        <th>Linha 6</th>
+                        <th>Linha 7</th>
+                        <th>Linha 8</th>
+                        <th>Linha 9</th>
+                        <th>Linha 10</th>
+                        <th>Linha 14</th>
+                    </tr>
+                </thead>
+
+
+                <!-- O JavaScript poderá preencher daqui para frente -->
+                <tbody id="detalhamentoBody">
+
+                    <tr id="rowAmarela">
+
+                        <td>
+                            <span class="badge badge-yellow">
+                                Amarela
+                            </span>
+                        </td>
+
+                        <td data-linha="Linha 1" data-field="amarela">0</td>
+                        <td data-linha="Linha 2" data-field="amarela">0</td>
+                        <td data-linha="Linha 3" data-field="amarela">0</td>
+                        <td data-linha="Linha 4" data-field="amarela">0</td>
+                        <td data-linha="Linha 5" data-field="amarela">0</td>
+                        <td data-linha="Linha 6" data-field="amarela">0</td>
+                        <td data-linha="Linha 7" data-field="amarela">0</td>
+                        <td data-linha="Linha 8" data-field="amarela">0</td>
+                        <td data-linha="Linha 9" data-field="amarela">0</td>
+                        <td data-linha="Linha 10" data-field="amarela">0</td>
+                        <td data-linha="Linha 14" data-field="amarela">0</td>
+
+                    </tr>
+
+
+                    <tr id="rowVermelha">
+
+                        <td>
+                            <span class="badge badge-red">
+                                Vermelha
+                            </span>
+                        </td>
+
+                        <td data-linha="Linha 1" data-field="vermelha">0</td>
+                        <td data-linha="Linha 2" data-field="vermelha">0</td>
+                        <td data-linha="Linha 3" data-field="vermelha">0</td>
+                        <td data-linha="Linha 4" data-field="vermelha">0</td>
+                        <td data-linha="Linha 5" data-field="vermelha">0</td>
+                        <td data-linha="Linha 6" data-field="vermelha">0</td>
+                        <td data-linha="Linha 7" data-field="vermelha">0</td>
+                        <td data-linha="Linha 8" data-field="vermelha">0</td>
+                        <td data-linha="Linha 9" data-field="vermelha">0</td>
+                        <td data-linha="Linha 10" data-field="vermelha">0</td>
+                        <td data-linha="Linha 14" data-field="vermelha">0</td>
+
+                    </tr>
+
+
+                    <tr id="rowNd">
+
+                        <td>
+                            <span class="badge badge-gray">
+                                ND
+                            </span>
+                        </td>
+
+                        <td data-linha="Linha 1" data-field="nd">0</td>
+                        <td data-linha="Linha 2" data-field="nd">0</td>
+                        <td data-linha="Linha 3" data-field="nd">0</td>
+                        <td data-linha="Linha 4" data-field="nd">0</td>
+                        <td data-linha="Linha 5" data-field="nd">0</td>
+                        <td data-linha="Linha 6" data-field="nd">0</td>
+                        <td data-linha="Linha 7" data-field="nd">0</td>
+                        <td data-linha="Linha 8" data-field="nd">0</td>
+                        <td data-linha="Linha 9" data-field="nd">0</td>
+                        <td data-linha="Linha 10" data-field="nd">0</td>
+                        <td data-linha="Linha 14" data-field="nd">0</td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </section>
+
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase/config.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+
+</html>
